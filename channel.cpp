@@ -9,22 +9,28 @@ void Channel::SetReadCallback(CallbackType readCallback)
 {
 	m_readCallback = readCallback;
 }
+
 void Channel::SetWriteCallback(CallbackType writeCallback)
+
 {
 	m_writeCallback = writeCallback;
 }
+
 void Channel::SetErrorCallback(CallbackType errorCallback)
 {
 	m_errorCallback = errorCallback;
 }
+
 void Channel::SetEvents(int events)
 {
 	m_events = events;
 }
+
 int Channel::GetFd()
 {
 	return m_fd;
 }
+
 int Channel::GetEvents()
 {
 	return m_events;

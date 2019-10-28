@@ -3,7 +3,16 @@
 #ifndef NETUTIL_H
 #define NETUTIL_H
 
-struct sockaddr_in;
+#include <stdint.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <string.h>
+#include <errno.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <netinet/tcp.h>
 
 class NetUtil
 {

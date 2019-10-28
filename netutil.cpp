@@ -1,14 +1,3 @@
-#include <stdint.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <string.h>
-#include <errno.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <netinet/tcp.h>
-
 #include "netutil.h"
 #include "base/log.h"
 
@@ -18,7 +7,7 @@ int NetUtil::Listen(const char * serverIp, uint16_t port)
 	int fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (-1 == fd)
 	{
-		ERRLOG("%s %s %d, set reuse address error. %s", __FILE__, __func__, __LINE__, strerror(errno));
+		ERRLOG("%s %s %d, socket error. %s", __FILE__, __func__, __LINE__, strerror(errno));
 		return -1;
 	}
 	
@@ -29,13 +18,13 @@ int NetUtil::Listen(const char * serverIp, uint16_t port)
 	SetAddr(serverIp, port, servAddr);
 	if (-1 == bind(fd, reinterpret_cast<struct sockaddr *>(&servAddr), static_cast<socklen_t>(sizeof(servAddr))))
 	{
-		ERRLOG("%s %s %d, set reuse address error. %s", __FILE__, __func__, __LINE__, strerror(errno));
+		ERRLOG("%s %s %d, bind error. %s", __FILE__, __func__, __LINE__, strerror(errno));
 		close(fd);
 		return -1;
 	}
 	if (-1 == listen(fd, 128))
 	{
-		ERRLOG("%s %s %d, set reuse address error. %s", __FILE__, __func__, __LINE__, strerror(errno));
+		ERRLOG("%s %s %d, listen error. %s", __FILE__, __func__, __LINE__, strerror(errno));
 		close(fd);
 		return -1;
 	}
@@ -47,7 +36,7 @@ int NetUtil::Connect(const char * serverIp, uint16_t port)
 	int fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (-1 == fd)
 	{
-		ERRLOG("%s %s %d, set reuse address error. %s", __FILE__, __func__, __LINE__, strerror(errno));
+		ERRLOG("%s %s %d, socket error. %s", __FILE__, __func__, __LINE__, strerror(errno));
 		return -1;
 	}
 	
@@ -56,7 +45,7 @@ int NetUtil::Connect(const char * serverIp, uint16_t port)
 	if (-1 == connect(fd, reinterpret_cast<struct sockaddr *>(&servAddr), static_cast<socklen_t>(sizeof(servAddr))))
 	{
 		close(fd);
-		ERRLOG("%s %s %d, set reuse address error. %s", __FILE__, __func__, __LINE__, strerror(errno));
+		ERRLOG("%s %s %d, connect error. %s", __FILE__, __func__, __LINE__, strerror(errno));
 		return -1;
 	}
 	
