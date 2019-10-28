@@ -19,7 +19,7 @@ public:
 	void SetErrorCallback(CallbackType errorCallback);
 	void Loop();
 	
-//private:
+private:
 	void NewConnectReadHandler(EventLoop & eventLoop, std::shared_ptr<Channel> ptChannel);
 	
 private:
