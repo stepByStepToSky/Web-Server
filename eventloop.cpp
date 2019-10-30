@@ -89,4 +89,5 @@ void EventLoop::ProcessActiveEvents()
 		ChannelPtr ptChannel = m_fd2ChannelPtrMap[m_vecActiveEvents[i].data.fd];
 		ptChannel->HandleEvent(*this, ptChannel, m_vecActiveEvents[i].events);
 	}
+	m_activeEventsCnt = 0;
 }

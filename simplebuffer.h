@@ -28,6 +28,7 @@ public:
 	int WriteToFd(int fd);
 	
 	char * Buffer();
+	// the index of useful data is [m_readOffset, m_writeOffset)
 	size_t BufferSize();
 	void ReadFromBuffer(size_t nRead);
 	void WriteToBuffer(const char * data, size_t writeSize);

@@ -66,7 +66,7 @@ void TcpServer::NewConnectReadHandler(EventLoop & eventLoop, std::shared_ptr<Cha
 	int fd;
 	struct sockaddr_in peerAddr;
 	char ipStr[INET_ADDRSTRLEN];
-	socklen_t peerAddrLen;
+	socklen_t peerAddrLen = 1;
 	
 	while(-1 != (fd = accept(m_listenFd, reinterpret_cast<struct sockaddr*>(&peerAddr), &peerAddrLen)))
 	{
@@ -93,7 +93,11 @@ void TcpServer::NewConnectReadHandler(EventLoop & eventLoop, std::shared_ptr<Cha
 		ptConnChannel->SetWriteCallback(std::bind(&TcpServer::WriteFromBufferToFd, this, _1, _2));
 		ptConnChannel->SetErrorCallback(std::bind(&TcpServer::ErrorCallBack, this, _1, _2));
 		m_eventLoop.AddChannel(ptConnChannel, EPOLLIN);
+		
+		peerAddrLen = 1; // to avoid accept(): Invalid Argument
 	}
+	
+	ERRLOG("%s %s %d, m_listenFd=%d, listen error. %s", __FILE__, __func__, __LINE__, m_listenFd, strerror(errno));
 }
 
 

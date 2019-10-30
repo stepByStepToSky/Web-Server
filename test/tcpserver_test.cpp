@@ -27,7 +27,7 @@ void ReadCallback(std::shared_ptr<Channel> ptChannel)
 	SimpleBuffer & inBuffer = ptChannel->GetInBuffer();
 	SimpleBuffer & outBuffer = ptChannel->GetOutBuffer();
 	cout << inBuffer.Buffer() << endl;
-	inBuffer.ReadFromBuffer(inBuffer.BufferSize());
+	//inBuffer.ReadFromBuffer(inBuffer.BufferSize());
 	
 	const char * respond = "HTTP/1.1 200 OK\r\nContent-type: text/plain\r\nContent-Length:13\r\n\r\nHello World\r\n";
 	outBuffer.WriteToBuffer(respond, strlen(respond));
