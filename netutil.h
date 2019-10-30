@@ -19,7 +19,7 @@ class NetUtil
 public:
 	// if success, return nonblock socket fd
 	static int Listen(const char * serverIp, uint16_t port);
-	// if success return block socket fd
+	// if success, return block socket fd
 	static int Connect(const char * serverIp, uint16_t port);
 	
 	

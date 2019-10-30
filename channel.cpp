@@ -36,6 +36,16 @@ int Channel::GetEvents()
 	return m_events;
 }
 
+SimpleBuffer & Channel::GetInBuffer()
+{
+	return m_inBuffer;
+}
+
+SimpleBuffer & Channel::GetOutBuffer()
+{
+	return m_outBuffer;
+}
+
 void Channel::HandleEvent(EventLoop & eventLoop, std::shared_ptr<Channel> ptChannel, int revents)
 {
 	if (revents & (EPOLLHUP | EPOLLERR))

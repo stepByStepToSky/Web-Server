@@ -9,6 +9,7 @@
 #include <sys/epoll.h>
 
 #include "base/log.h"
+#include "simplebuffer.h"
 
 class EventLoop;
 
@@ -25,6 +26,8 @@ public:
 	void SetEvents(int events);
 	int GetFd();
 	int GetEvents();
+	SimpleBuffer & GetInBuffer();
+	SimpleBuffer & GetOutBuffer();
 	
 	void HandleEvent(EventLoop & eventLoop, std::shared_ptr<Channel> ptChannel, int revents);
 	
@@ -34,6 +37,9 @@ private:
 	CallbackType m_readCallback;
 	CallbackType m_writeCallback;
 	CallbackType m_errorCallback;
+	
+	SimpleBuffer m_inBuffer;
+	SimpleBuffer m_outBuffer;
 };
 
 #endif

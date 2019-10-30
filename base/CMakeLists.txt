@@ -7,6 +7,8 @@ set(LIB_DIR ${CMAKE_CURRENT_SOURCE_DIR}/lib
             /usr/local/lib
 	    /usr/lib/x86_64-linux-gnu)
 
+set (LIBHELLO_SRC mutex.cpp thread.cpp condition.cpp writefile.cpp logfile.cpp asynclog.cpp log.cpp)
+
 add_compile_options(-std=c++11 -g)
 
 include_directories(${INCLUDE_DIR})
@@ -30,3 +32,5 @@ target_link_libraries(threadpool -lpthread)
 target_link_libraries(singleton -lpthread)
 target_link_libraries(asynclog -lpthread)
 target_link_libraries(log -lpthread)
+
+ADD_LIBRARY(asynclogStaticLib STATIC ${LIBHELLO_SRC})

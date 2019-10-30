@@ -2,14 +2,18 @@
 #define TCPSERVER_H
 
 #include <memory>
+#include <stdio.h>
+#include <stdlib.h>
+#include <arpa/inet.h>
 #include "eventloop.h"
 #include "channel.h"
+#include "base/log.h"
 
 class TcpServer
 {
 public:
 	typedef EventLoop::ChannelPtr ChannelPtr;
-	typedef Channel::CallbackType CallbackType;
+	typedef std::function<void (std::shared_ptr<Channel>)> CallbackType;
 	
 	TcpServer(const char * serverIp, uint16_t port);
 	~TcpServer();
@@ -21,6 +25,9 @@ public:
 	
 private:
 	void NewConnectReadHandler(EventLoop & eventLoop, std::shared_ptr<Channel> ptChannel);
+	void ReadFromFdToBuffer(EventLoop & eventLoop, std::shared_ptr<Channel> ptChannel);
+	void WriteFromBufferToFd(EventLoop & eventLoop, std::shared_ptr<Channel> ptChannel);
+	void ErrorCallBack(EventLoop & eventLoop, std::shared_ptr<Channel> ptChannel);
 	
 private:
 	int m_listenFd;
