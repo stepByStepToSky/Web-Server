@@ -30,7 +30,6 @@ void ReadCallback(std::shared_ptr<Channel> ptChannel)
 	cout << inBuffer.Buffer();
 	cout << "inBuffer.Find(' ') = " << inBuffer.Find(' ') << endl;
 	cout << "inBuffer.Find(\"\\r\\n\") = " << inBuffer.Find("\r\n") << endl;
-	//inBuffer.ReadFromBuffer(inBuffer.BufferSize());
 	
 	HttpMessage httpmessage;
 	HttpMessage::ParseState state = httpmessage.Parse(inBuffer);
@@ -44,6 +43,9 @@ void ReadCallback(std::shared_ptr<Channel> ptChannel)
 	{
 		cout << iter->first << "=" << iter->second << endl;
 	}
+	cout << "httpmessage.GetBody()=" << httpmessage.GetBody() << endl;
+	
+	inBuffer.ReadFromBuffer(inBuffer.BufferSize());
 	
 	const char * respond = "HTTP/1.1 200 OK\r\nContent-type: text/plain\r\nContent-Length:13\r\n\r\nHello World\r\n";
 	outBuffer.WriteToBuffer(respond, strlen(respond));

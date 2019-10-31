@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef HTTPMESSAGE_H
 #define HTTPMESSAGE_H
 
@@ -10,6 +12,8 @@
 class HttpMessage
 {
 public:
+	typedef std::map<std::string, std::string> HeadMapType;
+	
 	enum ParseRequestType
 	{
 		ParseRequestLine = 1,
@@ -39,6 +43,7 @@ public:
 	const std::string & GetMethod();
 	const std::string & GetUrl();
 	const std::string & GetHttpVersion();
+	const std::string & GetBody();
 	const std::map<std::string, std::string> & GetHeadContent();
 	ParseState Parse(SimpleBuffer & inBuffer);
 	
@@ -49,7 +54,7 @@ private:
 	std::string m_method;
 	std::string m_httpVersion;
 	std::string m_url;
-	std::map<std::string, std::string> m_headContent;
+	HeadMapType m_headContent;
 	std::string m_bodyStr;
 };
 
