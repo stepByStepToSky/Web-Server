@@ -33,6 +33,15 @@ public:
 	void ReadFromBuffer(size_t nRead);
 	void WriteToBuffer(const char * data, size_t writeSize);
 	
+	// return -1, not found
+	// else return the index of the char c
+	ssize_t Find(const char c);
+	
+	// return -1, not found
+	// else return the index of the first char of src
+	// FIX ME, change to KMP algorithm
+	ssize_t Find(const char * src);
+	
 private:
 	static const size_t kReadOrWriteFromFdSize;
 	

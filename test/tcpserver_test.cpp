@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "../tcpserver.h"
+#include "../httpmessage.h"
 
 using namespace std;
 
@@ -26,8 +27,23 @@ void ReadCallback(std::shared_ptr<Channel> ptChannel)
 	cout << "read from " << ptChannel->GetFd() << endl;
 	SimpleBuffer & inBuffer = ptChannel->GetInBuffer();
 	SimpleBuffer & outBuffer = ptChannel->GetOutBuffer();
-	cout << inBuffer.Buffer() << endl;
+	cout << inBuffer.Buffer();
+	cout << "inBuffer.Find(' ') = " << inBuffer.Find(' ') << endl;
+	cout << "inBuffer.Find(\"\\r\\n\") = " << inBuffer.Find("\r\n") << endl;
 	//inBuffer.ReadFromBuffer(inBuffer.BufferSize());
+	
+	HttpMessage httpmessage;
+	HttpMessage::ParseState state = httpmessage.Parse(inBuffer);
+	cout << "ParseState=" << state << endl;
+	cout << "httpmessage.GetMethod()=" << httpmessage.GetMethod() << endl;
+	cout << "httpmessage.GetUrl()=" << httpmessage.GetUrl() << endl;
+	cout << "httpmessage.GetHttpVersion()=" << httpmessage.GetHttpVersion() << endl;
+	
+	map<string, string> & headContent = httpmessage.GetHeadContent();
+	for (map<string, string>::iterator iter = headContent.begin(); headContent.end() != iter; ++iter)
+	{
+		cout << iter->first << "=" << iter->second << endl;
+	}
 	
 	const char * respond = "HTTP/1.1 200 OK\r\nContent-type: text/plain\r\nContent-Length:13\r\n\r\nHello World\r\n";
 	outBuffer.WriteToBuffer(respond, strlen(respond));

@@ -142,3 +142,37 @@ void SimpleBuffer::WriteToBuffer(const char * data, size_t writeSize)
 	memmove(m_buffer + m_writeOffset, data, writeSize);
 	m_writeOffset += writeSize;
 }
+
+ssize_t SimpleBuffer::Find(const char c)
+{
+	for (size_t i = m_readOffset; i < m_writeOffset; ++i)
+	{
+		if (c == m_buffer[i])
+		{
+			return (i - m_readOffset);
+		}
+	}
+	return -1;
+}
+
+ssize_t SimpleBuffer::Find(const char * src)
+{
+	const size_t srcLen = strlen(src);
+	for (size_t i = m_readOffset; i + srcLen < m_writeOffset; ++i)
+	{
+		size_t j = 0;
+		for (; j < srcLen; ++j)
+		{
+			if (src[j] != m_buffer[i+j])
+			{
+				break;
+			}
+		}
+		
+		if (srcLen == j)
+		{
+			return (i - m_readOffset);
+		}
+	}
+	return -1;
+}
