@@ -17,10 +17,14 @@ public:
 	typedef EventLoop::ChannelPtr ChannelPtr;
 	typedef std::function<void (std::shared_ptr<Channel>)> CallbackType;
 	
+	// return -1 means request gets error or return 0 we should close the socket, we should close the channel
+	// else return 1
+	typedef std::function<int (std::shared_ptr<Channel>)> ReadCallbackType;
+	
 	TcpServer(const char * serverIp, uint16_t port);
 	~TcpServer();
 	
-	void SetReadCallback(CallbackType readCallback);
+	void SetReadCallback(ReadCallbackType readCallback);
 	void SetWriteCallback(CallbackType writeCallback);
 	void SetErrorCallback(CallbackType errorCallback);
 	void Loop();
@@ -35,7 +39,7 @@ private:
 	int m_listenFd;
 	ChannelPtr m_ptListenChannel;
 	EventLoop m_eventLoop;
-	CallbackType m_readCallback;
+	ReadCallbackType m_readCallback;
 	CallbackType m_writeCallback;
 	CallbackType m_errorCallback;
 };

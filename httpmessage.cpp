@@ -178,3 +178,13 @@ HttpMessage::ParseState HttpMessage::Parse(SimpleBuffer & inBuffer)
 	
 	return Done;
 }
+
+void HttpMessage::Reset()
+{
+	m_parseStage = ParseRequestLine;
+	HeadMapType tempHeadMap;
+	m_headContent.swap(tempHeadMap);
+}
+
+
+

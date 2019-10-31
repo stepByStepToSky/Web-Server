@@ -7,24 +7,38 @@
 void TcpServer::ReadFromFdToBuffer(EventLoop & eventLoop, std::shared_ptr<Channel> ptChannel)
 {
 	SimpleBuffer & inBuffer = ptChannel->GetInBuffer();
+	SimpleBuffer & outBuffer = ptChannel->GetOutBuffer();
 	int nRead = inBuffer.ReadFromFd(ptChannel->GetFd());
+	int readCallbackResult = 0;
 	if (0 < nRead)
 	{
 		DEBUGLOG("%s %s %d, read from fd=%d", __FILE__, __func__, __LINE__, ptChannel->GetFd());
 		if (m_readCallback)
 		{
-			m_readCallback(ptChannel);
+			readCallbackResult = m_readCallback(ptChannel);
 		}
-		SimpleBuffer & outBuffer = ptChannel->GetOutBuffer();
+		
 		if (0 < outBuffer.BufferSize())
 		{
 			DEBUGLOG("%s %s %d, %d bytes in the buffer of fd=%d need to be writen", __FILE__, __func__, __LINE__, outBuffer.BufferSize(), ptChannel->GetFd());
 			eventLoop.AddChannel(ptChannel, EPOLLOUT);
 		}
 	}
-	else if (0 >= nRead)
+	
+	if (1 != nRead || 1 != readCallbackResult)
 	{
-		DEBUGLOG("%s %s %d, fd=%d %s", __FILE__, __func__, __LINE__, ptChannel->GetFd(), (0 == nRead ? "close/shoutdown" : "gets error"));
+		if (0 == readCallbackResult && 0 < outBuffer.BufferSize())	// should close, but maybe there is some data in outBuffer, we should write them to fd, then close
+		{
+			for (; 1 == outBuffer.WriteToFd(ptChannel->GetFd()); )
+			{
+			}
+			DEBUGLOG("%s %s %d, fd=%d read callback function return close", __FILE__, __func__, __LINE__, ptChannel->GetFd());
+		}
+		else
+		{
+			DEBUGLOG("%s %s %d, fd=%d %s", __FILE__, __func__, __LINE__, ptChannel->GetFd(), (0 == nRead ? "socket close/shoutdown" : (-1 == nRead ? "socket gets error" : "read callback function return error")));
+		}
+		
 		// peer socket close/shoutdown or get error
 		eventLoop.RemoveChannel(ptChannel, EPOLLIN | EPOLLOUT);
 		close(ptChannel->GetFd());
@@ -118,7 +132,7 @@ void TcpServer::Loop()
 	m_eventLoop.Loop();
 }
 
-void TcpServer::SetReadCallback(CallbackType readCallback)
+void TcpServer::SetReadCallback(ReadCallbackType readCallback)
 {
 	m_readCallback = readCallback;
 }

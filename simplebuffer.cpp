@@ -158,7 +158,7 @@ ssize_t SimpleBuffer::Find(const char c)
 ssize_t SimpleBuffer::Find(const char * src)
 {
 	const size_t srcLen = strlen(src);
-	for (size_t i = m_readOffset; i + srcLen < m_writeOffset; ++i)
+	for (size_t i = m_readOffset; i + srcLen <= m_writeOffset; ++i)
 	{
 		size_t j = 0;
 		for (; j < srcLen; ++j)

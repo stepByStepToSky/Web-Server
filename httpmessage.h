@@ -23,7 +23,7 @@ public:
 	
 	typedef enum ParseState
 	{
-		Again = 1,	// more data need
+		Again = 100,	// more data need
 		Error,		// parse data gets error
 		Done		// parse a complete message
 	} ParseState;
@@ -31,10 +31,10 @@ public:
 	enum RespondType
 	{
 		Correct = 200,
-        BadReq = 400,   // bad request
-        NotFound = 404, // not found
-        SerError = 500, // internal server error
-        MeNotIm = 501	// method not implement
+		BadReq = 400,   // bad request
+		NotFound = 404, // not found
+		SerError = 500, // internal server error
+		MeNotIm = 501	// method not implement
 	};
 	
 	
@@ -46,14 +46,14 @@ public:
 	const std::string & GetBody();
 	const std::map<std::string, std::string> & GetHeadContent();
 	ParseState Parse(SimpleBuffer & inBuffer);
-	
+	void Reset();
 	
 private:
 	ParseRequestType m_parseStage;
 	RespondType m_respondType;
 	std::string m_method;
-	std::string m_httpVersion;
 	std::string m_url;
+	std::string m_httpVersion;
 	HeadMapType m_headContent;
 	std::string m_bodyStr;
 };

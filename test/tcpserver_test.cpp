@@ -6,7 +6,7 @@
 
 using namespace std;
 
-void ReadCallback(std::shared_ptr<Channel> ptChannel);
+int ReadCallback(std::shared_ptr<Channel> ptChannel);
 void WriteCallback(std::shared_ptr<Channel> ptChannel);
 void ErrorCallback(std::shared_ptr<Channel> ptChannel);
 
@@ -22,7 +22,7 @@ int main()
 	server.Loop();
 }
 
-void ReadCallback(std::shared_ptr<Channel> ptChannel)
+int ReadCallback(std::shared_ptr<Channel> ptChannel)
 {
 	cout << "read from " << ptChannel->GetFd() << endl;
 	SimpleBuffer & inBuffer = ptChannel->GetInBuffer();
@@ -49,6 +49,7 @@ void ReadCallback(std::shared_ptr<Channel> ptChannel)
 	
 	const char * respond = "HTTP/1.1 200 OK\r\nContent-type: text/plain\r\nContent-Length:13\r\n\r\nHello World\r\n";
 	outBuffer.WriteToBuffer(respond, strlen(respond));
+	return 0;
 }
 
 void WriteCallback(std::shared_ptr<Channel> ptChannel)

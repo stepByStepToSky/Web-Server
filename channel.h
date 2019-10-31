@@ -10,6 +10,7 @@
 
 #include "base/log.h"
 #include "simplebuffer.h"
+#include "httpmessage.h"
 
 class EventLoop;
 
@@ -28,6 +29,7 @@ public:
 	int GetEvents();
 	SimpleBuffer & GetInBuffer();
 	SimpleBuffer & GetOutBuffer();
+	HttpMessage & GetHttpMessage();
 	
 	void HandleEvent(EventLoop & eventLoop, std::shared_ptr<Channel> ptChannel, int revents);
 	
@@ -40,6 +42,7 @@ private:
 	
 	SimpleBuffer m_inBuffer;
 	SimpleBuffer m_outBuffer;
+	HttpMessage m_httpmessage;
 };
 
 #endif

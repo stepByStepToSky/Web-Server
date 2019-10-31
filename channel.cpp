@@ -46,6 +46,11 @@ SimpleBuffer & Channel::GetOutBuffer()
 	return m_outBuffer;
 }
 
+HttpMessage & Channel::GetHttpMessage()
+{
+	return m_httpmessage;
+}
+
 void Channel::HandleEvent(EventLoop & eventLoop, std::shared_ptr<Channel> ptChannel, int revents)
 {
 	if (revents & (EPOLLHUP | EPOLLERR))
