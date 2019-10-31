@@ -5,22 +5,22 @@ HttpMessage::HttpMessage() : m_parseStage(ParseRequestLine)
 	
 }
 
-std::string HttpMessage::GetMethod()
+const std::string & HttpMessage::GetMethod()
 {
 	return m_method;
 }
 
-std::string HttpMessage::GetUrl()
+const std::string & HttpMessage::GetUrl()
 {
 	return m_url;
 }
 
-std::string HttpMessage::GetHttpVersion()
+const std::string & HttpMessage::GetHttpVersion()
 {
 	return m_httpVersion;
 }
 
-std::map<std::string, std::string> & HttpMessage::GetHeadContent()
+const std::map<std::string, std::string> & HttpMessage::GetHeadContent()
 {
 	return m_headContent;
 }

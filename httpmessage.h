@@ -36,10 +36,10 @@ public:
 	
 public:
 	HttpMessage();
-	std::string GetMethod();
-	std::string GetUrl();
-	std::string GetHttpVersion();
-	std::map<std::string, std::string> & GetHeadContent();
+	const std::string & GetMethod();
+	const std::string & GetUrl();
+	const std::string & GetHttpVersion();
+	const std::map<std::string, std::string> & GetHeadContent();
 	ParseState Parse(SimpleBuffer & inBuffer);
 	
 	

@@ -39,8 +39,8 @@ void ReadCallback(std::shared_ptr<Channel> ptChannel)
 	cout << "httpmessage.GetUrl()=" << httpmessage.GetUrl() << endl;
 	cout << "httpmessage.GetHttpVersion()=" << httpmessage.GetHttpVersion() << endl;
 	
-	map<string, string> & headContent = httpmessage.GetHeadContent();
-	for (map<string, string>::iterator iter = headContent.begin(); headContent.end() != iter; ++iter)
+	const map<string, string> & headContent = httpmessage.GetHeadContent();
+	for (map<string, string>::const_iterator iter = headContent.begin(); headContent.end() != iter; ++iter)
 	{
 		cout << iter->first << "=" << iter->second << endl;
 	}
