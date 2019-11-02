@@ -38,7 +38,6 @@ int SimpleBuffer::ReadFromFd(int fd)
 			{
 				return - 1;
 			}
-			free(m_buffer);
 			m_buffer = newBuffer;
 			m_allocSize = newSize;
 		}
@@ -94,7 +93,7 @@ int SimpleBuffer::WriteToFd(int fd)
 	return 1;
 }
 
-char * SimpleBuffer::Buffer()
+const char * SimpleBuffer::Buffer()
 {
 	m_buffer[m_writeOffset] = '\0';
 	return (m_buffer + m_readOffset);
@@ -133,7 +132,6 @@ void SimpleBuffer::WriteToBuffer(const char * data, size_t writeSize)
 			{
 				return;
 			}
-			free(m_buffer);
 			m_buffer = newBuffer;
 			m_allocSize = newSize;
 		}
@@ -141,6 +139,20 @@ void SimpleBuffer::WriteToBuffer(const char * data, size_t writeSize)
 	
 	memmove(m_buffer + m_writeOffset, data, writeSize);
 	m_writeOffset += writeSize;
+}
+
+void SimpleBuffer::Append(const char * format, ...)
+{
+	char buff[1024];
+	memset(buff, 0, sizeof(buff));
+	int nWrite = 0;
+	va_list ap;
+	va_start(ap, format);
+	if (0 < (nWrite = vsnprintf(buff, sizeof(buff), format, ap)))
+	{
+		WriteToBuffer(buff, nWrite);
+	}
+	va_end(ap);
 }
 
 ssize_t SimpleBuffer::Find(const char c)

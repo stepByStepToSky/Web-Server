@@ -85,9 +85,13 @@ void EventLoop::ProcessActiveEvents()
 {
 	for (int i = 0; i < m_activeEventsCnt; ++i)
 	{
-		// hold this channel to guarantee this process is safe
-		ChannelPtr ptChannel = m_fd2ChannelPtrMap[m_vecActiveEvents[i].data.fd];
-		ptChannel->HandleEvent(*this, ptChannel, m_vecActiveEvents[i].events);
+		std::unordered_map<int, ChannelPtr>::iterator iter = m_fd2ChannelPtrMap.find(m_vecActiveEvents[i].data.fd);
+		if (m_fd2ChannelPtrMap.end() != iter)
+		{
+			// hold this channel to guarantee this process is safe
+			ChannelPtr ptChannel = iter->second;
+			ptChannel->HandleEvent(*this, ptChannel, m_vecActiveEvents[i].events);	
+		}
 	}
 	m_activeEventsCnt = 0;
 }

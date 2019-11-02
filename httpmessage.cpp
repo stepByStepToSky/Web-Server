@@ -30,6 +30,16 @@ const HttpMessage::HeadMapType & HttpMessage::GetHeadContent()
 	return m_headContent;
 }
 
+HttpMessage::RespondType HttpMessage::GetRespondCode()
+{
+	return m_respondCode;
+}
+
+const std::string & HttpMessage::GetRespondMsg()
+{
+	return m_respondMsg;
+}
+
 HttpMessage::ParseState HttpMessage::Parse(SimpleBuffer & inBuffer)
 {
 	if (ParseRequestLine == m_parseStage)
@@ -44,17 +54,19 @@ HttpMessage::ParseState HttpMessage::Parse(SimpleBuffer & inBuffer)
 		if (-1 == pos)
 		{
 			ERRLOG("%s %s %d, %s is invalid", __FILE__, __func__, __LINE__, inBuffer.Buffer());
-			m_respondType = BadReq;
+			m_respondCode = BadReq;
+			m_respondMsg = "Bad request";
 			return Error;
 		}
 		m_method.assign(inBuffer.Buffer(), pos);
 		inBuffer.ReadFromBuffer(1 + pos);
-		transform(m_method.begin(), m_method.end(), m_method.begin(),
+		std::transform(m_method.begin(), m_method.end(), m_method.begin(),
               [](unsigned char c) { return std::toupper(c); });
 		if (("GET" != m_method) && ("POST" != m_method))
 		{
 			ERRLOG("%s %s %d, %s is not implemented", __FILE__, __func__, __LINE__, m_method.c_str());
-			m_respondType = MeNotIm;
+			m_respondCode = MeNotIm;
+			m_respondMsg = "Method is not implemented";
 			return Error;
 		}
 		
@@ -62,7 +74,8 @@ HttpMessage::ParseState HttpMessage::Parse(SimpleBuffer & inBuffer)
 		if (-1 == pos)
 		{
 			ERRLOG("%s %s %d, %s is invalid", __FILE__, __func__, __LINE__, inBuffer.Buffer());
-			m_respondType = BadReq;
+			m_respondCode = BadReq;
+			m_respondMsg = "Bad request";
 			return Error;
 		}
 		ssize_t paramPos = inBuffer.Find('?');
@@ -75,10 +88,11 @@ HttpMessage::ParseState HttpMessage::Parse(SimpleBuffer & inBuffer)
 			while(-1 != paramPos)
 			{
 				ssize_t keyEndPos = inBuffer.Find('=');
-				if (-1 == keyEndPos)
+				if (-1 == keyEndPos || keyEndPos > paramPos)
 				{
 					ERRLOG("%s %s %d, %s is invalid", __FILE__, __func__, __LINE__, inBuffer.Buffer());
-					m_respondType = BadReq;
+					m_respondCode = BadReq;
+					m_respondMsg = "Bad request";
 					return Error;
 				}
 				std::string sKey(inBuffer.Buffer(), keyEndPos);
@@ -92,14 +106,15 @@ HttpMessage::ParseState HttpMessage::Parse(SimpleBuffer & inBuffer)
 			if (-1 == pos)
 			{
 				ERRLOG("%s %s %d, %s is invalid", __FILE__, __func__, __LINE__, inBuffer.Buffer());
-				m_respondType = BadReq;
+				m_respondCode = BadReq;
+				m_respondMsg = "Bad request";
 				return Error;
 			}
 			ssize_t keyEndPos = inBuffer.Find('=');
-			if (-1 == keyEndPos)
+			if (-1 == keyEndPos || keyEndPos > pos)
 			{
 				ERRLOG("%s %s %d, %s is invalid", __FILE__, __func__, __LINE__, inBuffer.Buffer());
-				m_respondType = BadReq;
+				m_respondCode = BadReq;
 				return Error;
 			}
 			std::string sKey(inBuffer.Buffer(), keyEndPos);
@@ -144,10 +159,11 @@ HttpMessage::ParseState HttpMessage::Parse(SimpleBuffer & inBuffer)
 		}
 		
 		ssize_t keyEndPos = inBuffer.Find(':');
-		if (-1 == keyEndPos)
+		if (-1 == keyEndPos || keyEndPos > pos)
 		{
 			ERRLOG("%s %s %d, %s is invalid", __FILE__, __func__, __LINE__, inBuffer.Buffer());
-			m_respondType = BadReq;
+			m_respondCode = BadReq;
+			m_respondMsg = "Bad request";
 			return Error;
 		}
 		
@@ -157,13 +173,15 @@ HttpMessage::ParseState HttpMessage::Parse(SimpleBuffer & inBuffer)
 		inBuffer.ReadFromBuffer(pos + 2);
 	}
 	
+	
 	if (ParseRequestBody == m_parseStage)
 	{
 		HeadMapType::iterator iter = m_headContent.find("Content-Length");
 		if (m_headContent.end() == iter)
 		{
 			ERRLOG("%s %s %d, post method has no Content-Length information", __FILE__, __func__, __LINE__);
-			m_respondType = BadReq;
+			m_respondCode = BadReq;
+			m_respondMsg = "Bad request";
 			return Error;
 		}
 		
@@ -186,5 +204,22 @@ void HttpMessage::Reset()
 	m_headContent.swap(tempHeadMap);
 }
 
-
+void HttpMessage::BuildErrorRespond(int errCode, const std::string & errMsg, SimpleBuffer & outBuffer)
+{
+	std::string sBodyContent;
+	sBodyContent.append("<html><title>Something wrong with the request</title>");
+	sBodyContent.append("<body bgcolor=\"ffffff\">");
+	sBodyContent.append(std::to_string(errCode).c_str());
+	sBodyContent.append(" ");
+	sBodyContent.append(errMsg.c_str());
+	sBodyContent.append("<hr><em> Lufan's Web Server</em>\n</body></html>");
+	
+	outBuffer.Append("HTTP/1.1 %d %s\r\n", errCode, errMsg.c_str());
+	outBuffer.Append("Content-Type: text/html\r\n");
+	outBuffer.Append("Connection: Close\r\n");
+	outBuffer.Append("Content-Length: %d\r\n", static_cast<int>(sBodyContent.size()));
+	outBuffer.Append("Server: Lufan's Web Server\r\n");
+	outBuffer.Append("\r\n");
+	outBuffer.Append("%s", sBodyContent.c_str());
+}
 

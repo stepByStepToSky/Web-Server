@@ -16,7 +16,9 @@ int HttpCgiServer::ReadRequestCallback(std::shared_ptr<Channel> ptChannel)
 	}
 	else if (HttpMessage::Error == state)
 	{
-		return -1;
+		httpMessage.BuildErrorRespond(httpMessage.GetRespondCode(), httpMessage.GetRespondMsg(), outBuffer);
+		httpMessage.Reset();
+		return 0;
 	}
 	
 	cout << "ParseState=" << state << endl;

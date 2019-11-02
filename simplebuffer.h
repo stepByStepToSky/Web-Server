@@ -7,7 +7,9 @@
 #include <cstring>
 #include <unistd.h>
 #include <errno.h>
-
+#include <stdarg.h>
+#include <stdio.h>
+	   
 class SimpleBuffer
 {
 public:
@@ -27,11 +29,14 @@ public:
 	   return 1, shoule continue to write */
 	int WriteToFd(int fd);
 	
-	char * Buffer();
+	const char * Buffer();
 	// the index of useful data is [m_readOffset, m_writeOffset)
 	size_t BufferSize();
 	void ReadFromBuffer(size_t nRead);
 	void WriteToBuffer(const char * data, size_t writeSize);
+	
+	// note that the format string will not append into the buffer if the length is larger than 1024
+	void Append(const char * format, ...);
 	
 	// return -1, not found
 	// else return the index of the char c

@@ -45,12 +45,16 @@ public:
 	const std::string & GetHttpVersion();
 	const std::string & GetBody();
 	const std::map<std::string, std::string> & GetHeadContent();
+	RespondType GetRespondCode();
+	const std::string & GetRespondMsg();
 	ParseState Parse(SimpleBuffer & inBuffer);
 	void Reset();
+	void BuildErrorRespond(int errCode, const std::string & errMsg, SimpleBuffer & outBuffer);
 	
 private:
 	ParseRequestType m_parseStage;
-	RespondType m_respondType;
+	RespondType m_respondCode;
+	std::string m_respondMsg;
 	std::string m_method;
 	std::string m_url;
 	std::string m_httpVersion;
