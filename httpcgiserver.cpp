@@ -1,4 +1,6 @@
 #include "httpcgiserver.h"
+#include "basecgi.h"
+#include "exampleCgi/examplecgi.h"
 
 #include <iostream>
 using namespace std;
@@ -21,6 +23,7 @@ int HttpCgiServer::ReadRequestCallback(std::shared_ptr<Channel> ptChannel)
 		return 0;
 	}
 	
+	/*
 	cout << "ParseState=" << state << endl;
 	cout << "httpmessage.GetMethod()=" << httpMessage.GetMethod() << endl;
 	cout << "httpmessage.GetUrl()=" << httpMessage.GetUrl() << endl;
@@ -37,6 +40,16 @@ int HttpCgiServer::ReadRequestCallback(std::shared_ptr<Channel> ptChannel)
 	
 	const char * respond = "HTTP/1.1 200 OK\r\nContent-type: text/plain\r\nContent-Length:13\r\n\r\nHello World\r\n";
 	outBuffer.WriteToBuffer(respond, strlen(respond));
+	*/
+	
+	int respCode;
+	std::string sRespMsg, sRespBody;
+	
+	std::unique_ptr<ExampleCgi> exampleCgiPro(new ExampleCgi);
+	exampleCgiPro->Process(&httpMessage, respCode, sRespMsg, sRespBody);
+	
+	httpMessage.BuildCgiRespond(respCode, sRespMsg, sRespBody, outBuffer);
+	httpMessage.Reset();
 	
 	return 1;
 }

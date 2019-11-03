@@ -5,37 +5,37 @@ HttpMessage::HttpMessage() : m_parseStage(ParseRequestLine)
 	
 }
 
-const std::string & HttpMessage::GetMethod()
+const std::string & HttpMessage::GetMethod() const
 {
 	return m_method;
 }
 
-const std::string & HttpMessage::GetUrl()
+const std::string & HttpMessage::GetUrl() const
 {
 	return m_url;
 }
 
-const std::string & HttpMessage::GetHttpVersion()
+const std::string & HttpMessage::GetHttpVersion() const
 {
 	return m_httpVersion;
 }
 
-const std::string & HttpMessage::GetBody()
+const std::string & HttpMessage::GetBody() const
 {
 	return m_bodyStr;
 }
 
-const HttpMessage::HeadMapType & HttpMessage::GetHeadContent()
+const HttpMessage::HeadMapType & HttpMessage::GetHeadContent() const
 {
 	return m_headContent;
 }
 
-HttpMessage::RespondType HttpMessage::GetRespondCode()
+HttpMessage::RespondType HttpMessage::GetRespondCode() const
 {
 	return m_respondCode;
 }
 
-const std::string & HttpMessage::GetRespondMsg()
+const std::string & HttpMessage::GetRespondMsg() const
 {
 	return m_respondMsg;
 }
@@ -115,6 +115,7 @@ HttpMessage::ParseState HttpMessage::Parse(SimpleBuffer & inBuffer)
 			{
 				ERRLOG("%s %s %d, %s is invalid", __FILE__, __func__, __LINE__, inBuffer.Buffer());
 				m_respondCode = BadReq;
+				m_respondMsg = "Bad request";
 				return Error;
 			}
 			std::string sKey(inBuffer.Buffer(), keyEndPos);
@@ -223,3 +224,17 @@ void HttpMessage::BuildErrorRespond(int errCode, const std::string & errMsg, Sim
 	outBuffer.Append("%s", sBodyContent.c_str());
 }
 
+void HttpMessage::BuildCgiRespond(int respCode, const std::string & sRespMsg, const std::string & sRespBody, SimpleBuffer & outBuffer)
+{
+	outBuffer.Append("HTTP/1.1 %d %s\r\n", respCode, sRespMsg.c_str());
+	outBuffer.Append("Content-Type: text/html\r\n");
+	outBuffer.Append("Connection: keep-alive\r\n");
+	outBuffer.Append("Server: Lufan's Web Server\r\n");
+	
+	if (0 < sRespBody.size())
+	{
+		outBuffer.Append("Content-Length: %d\r\n", static_cast<int>(sRespBody.size()));
+		outBuffer.Append("\r\n");
+		outBuffer.Append("%s", sRespBody.c_str());
+	}
+}

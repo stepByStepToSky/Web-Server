@@ -40,16 +40,19 @@ public:
 	
 public:
 	HttpMessage();
-	const std::string & GetMethod();
-	const std::string & GetUrl();
-	const std::string & GetHttpVersion();
-	const std::string & GetBody();
-	const std::map<std::string, std::string> & GetHeadContent();
-	RespondType GetRespondCode();
-	const std::string & GetRespondMsg();
+	const std::string & GetMethod() const;
+	const std::string & GetUrl() const;
+	const std::string & GetHttpVersion() const;
+	const std::string & GetBody() const;
+	const HeadMapType & GetHeadContent() const;
+	RespondType GetRespondCode() const;
+	const std::string & GetRespondMsg() const;
 	ParseState Parse(SimpleBuffer & inBuffer);
 	void Reset();
 	void BuildErrorRespond(int errCode, const std::string & errMsg, SimpleBuffer & outBuffer);
+	
+	// Fix Me Content-Type json/text should change.
+	void BuildCgiRespond(int respCode, const std::string & sRespMsg, const std::string & sRespBody, SimpleBuffer & outBuffer);
 	
 private:
 	ParseRequestType m_parseStage;
