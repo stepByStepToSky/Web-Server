@@ -1,6 +1,5 @@
 #include "httpcgiserver.h"
-#include "basecgi.h"
-#include "exampleCgi/examplecgi.h"
+#include "cgidispatch.h"
 
 #include <iostream>
 using namespace std;
@@ -19,7 +18,6 @@ int HttpCgiServer::ReadRequestCallback(std::shared_ptr<Channel> ptChannel)
 	else if (HttpMessage::Error == state)
 	{
 		httpMessage.BuildErrorRespond(httpMessage.GetRespondCode(), httpMessage.GetRespondMsg(), outBuffer);
-		httpMessage.Reset();
 		return 0;
 	}
 	
@@ -45,8 +43,17 @@ int HttpCgiServer::ReadRequestCallback(std::shared_ptr<Channel> ptChannel)
 	int respCode;
 	std::string sRespMsg, sRespBody;
 	
-	std::unique_ptr<ExampleCgi> exampleCgiPro(new ExampleCgi);
-	exampleCgiPro->Process(&httpMessage, respCode, sRespMsg, sRespBody);
+	BaseFactory::Init();
+	BaseFactory::Url2CgiFactoryMapType url2CgiFactoryMap = BaseFactory::GetCgiFactoryMap();
+	BaseFactory::Url2CgiFactoryMapType::const_iterator iter = url2CgiFactoryMap.find(httpMessage.GetUrl());
+	if (url2CgiFactoryMap.end() == iter)
+	{
+		httpMessage.BuildErrorRespond(HttpMessage::NotFound, "Not Found This Cgi", outBuffer);
+		return 0;
+	}
+	
+	std::unique_ptr<BaseCgi> ptBaseCgi = iter->second->GetNewInstance();
+	ptBaseCgi->Process(&httpMessage, respCode, sRespMsg, sRespBody);
 	
 	httpMessage.BuildCgiRespond(respCode, sRespMsg, sRespBody, outBuffer);
 	httpMessage.Reset();
