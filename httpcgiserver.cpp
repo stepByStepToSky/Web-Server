@@ -43,7 +43,6 @@ int HttpCgiServer::ReadRequestCallback(std::shared_ptr<Channel> ptChannel)
 	int respCode;
 	std::string sRespMsg, sRespBody;
 	
-	BaseFactory::Init();
 	BaseFactory::Url2CgiFactoryMapType url2CgiFactoryMap = BaseFactory::GetCgiFactoryMap();
 	BaseFactory::Url2CgiFactoryMapType::const_iterator iter = url2CgiFactoryMap.find(httpMessage.GetUrl());
 	if (url2CgiFactoryMap.end() == iter)
@@ -77,6 +76,9 @@ HttpCgiServer::HttpCgiServer(const char * serverIp, uint16_t port) : m_tcpServer
 	m_tcpServer.SetReadCallback(std::bind(&HttpCgiServer::ReadRequestCallback, this, _1));
 	m_tcpServer.SetWriteCallback(std::bind(&HttpCgiServer::WriteCallback, this, _1));
 	m_tcpServer.SetErrorCallback(std::bind(&HttpCgiServer::ErrorCallback, this, _1));
+	
+	// cgi instance factory init
+	BaseFactory::Init();
 }
 
 void HttpCgiServer::Loop()
