@@ -18,8 +18,8 @@ public:
 	BaseCgi(const BaseCgi &) = delete;
 	BaseCgi & operator= (const BaseCgi &) = delete;
 	
-	void Process(const HttpMessage * ptHttpMessage, int & respondCode, std::string sRespMsg, std::string & sRespBoby);
-	virtual void ProcessImp(int & respondCode, std::string sRespMsg, std::string & sRespBoby) = 0;
+	void Process(const HttpMessage * ptHttpMessage, int & respondCode, std::string sRespMsg, std::string & sContentType, std::string & sRespBoby);
+	virtual void ProcessImp(int & respondCode, std::string sRespMsg, std::string & sContentType, std::string & sRespBoby) = 0;
 	
 	const std::string & GetUrl();
 	const std::string & GetBody();

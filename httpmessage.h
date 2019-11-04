@@ -13,6 +13,7 @@ class HttpMessage
 {
 public:
 	typedef std::map<std::string, std::string> HeadMapType;
+	typedef std::map<std::string, std::string> ContentTypeMapType;
 	
 	enum ParseRequestType
 	{
@@ -52,7 +53,10 @@ public:
 	void BuildErrorRespond(int errCode, const std::string & errMsg, SimpleBuffer & outBuffer);
 	
 	// Fix Me Content-Type json/text should change.
-	void BuildCgiRespond(int respCode, const std::string & sRespMsg, const std::string & sRespBody, SimpleBuffer & outBuffer);
+	void BuildCgiRespond(int respCode, const std::string & sRespMsg, const std::string & sContentType, const std::string & sRespBody, SimpleBuffer & outBuffer);
+	
+	static void InitContentTypeMap();
+	static ContentTypeMapType & GetContentTypeMap();
 	
 private:
 	ParseRequestType m_parseStage;
@@ -63,6 +67,8 @@ private:
 	std::string m_httpVersion;
 	HeadMapType m_headContent;
 	std::string m_bodyStr;
+	
+	static ContentTypeMapType m_contentTypeMap;
 };
 
 #endif

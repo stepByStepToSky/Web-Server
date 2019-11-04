@@ -1,6 +1,6 @@
 #include "examplecgi.h"
 
-void ExampleCgi::ProcessImp(int & respondCode, std::string sRespMsg, std::string & sRespBoby)
+void ExampleCgi::ProcessImp(int & respondCode, std::string sRespMsg, std::string & sContentType, std::string & sRespBoby)
 {	
 	// GET:  http://127.0.0.1:9508/?id=2020&name=lufanliao
 	// POST: curl -X POST http://127.0.0.1:9508/ -D '{"id":"2020", "name":"lufan"}'

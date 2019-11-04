@@ -12,12 +12,13 @@ BaseCgi::~BaseCgi()
 	
 }
 
-void BaseCgi::Process(const HttpMessage * ptHttpMessage, int & respondCode, std::string sRespMsg, std::string & sRespBoby)
+void BaseCgi::Process(const HttpMessage * ptHttpMessage, int & respondCode, std::string sRespMsg, std::string & sContentType, std::string & sRespBoby)
 {
 	m_ptHttpMessage = ptHttpMessage;
 	respondCode = 200;
 	sRespMsg.assign("OK", 2);
-	ProcessImp(respondCode, sRespMsg, sRespBoby);
+	sContentType.assign("text/html", 9);
+	ProcessImp(respondCode, sRespMsg, sContentType, sRespBoby);
 }
 
 const std::string & BaseCgi::GetUrl()

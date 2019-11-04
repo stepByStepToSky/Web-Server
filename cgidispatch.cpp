@@ -17,4 +17,5 @@ BaseFactory::Url2CgiFactoryMapType & BaseFactory::GetCgiFactoryMap()
 void BaseFactory::Init()
 {
 	AddCgiInstanceFactory<ExampleCgi>("/cgi-bin/example");
+	AddCgiInstanceFactory<LoginCgi>("/cgi-bin/login");
 }

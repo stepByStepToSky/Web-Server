@@ -1,5 +1,32 @@
 #include "httpmessage.h"
 
+HttpMessage::ContentTypeMapType HttpMessage::m_contentTypeMap;
+
+void HttpMessage::InitContentTypeMap()
+{
+	m_contentTypeMap.insert({".html", "text/html"});
+	m_contentTypeMap.insert({".avi", "video/x-msvideo"});
+	m_contentTypeMap.insert({".bmp", "image/bmp"});
+	m_contentTypeMap.insert({".c", "text/plain"});
+	m_contentTypeMap.insert({".doc", "application/msword"});
+	m_contentTypeMap.insert({".gif", "image/gif"});
+	m_contentTypeMap.insert({".gz", "application/x-gzip"});
+	m_contentTypeMap.insert({".htm", "text/html"});
+	m_contentTypeMap.insert({".ico", "image/x-icon"});
+	m_contentTypeMap.insert({".jpg", "image/jpeg"});
+	m_contentTypeMap.insert({".png", "image/png"});
+	m_contentTypeMap.insert({".txt", "text/plain"});
+	m_contentTypeMap.insert({".js", "application/javascript"});
+	m_contentTypeMap.insert({".css", "text/css"});
+	m_contentTypeMap.insert({".mp3", "audio/mp3"});
+	m_contentTypeMap.insert({"default", "text/html"});
+}
+
+HttpMessage::ContentTypeMapType & HttpMessage::GetContentTypeMap()
+{
+	return m_contentTypeMap;
+}
+
 HttpMessage::HttpMessage() : m_parseStage(ParseRequestLine)
 {
 	
@@ -224,10 +251,10 @@ void HttpMessage::BuildErrorRespond(int errCode, const std::string & errMsg, Sim
 	outBuffer.Append("%s", sBodyContent.c_str());
 }
 
-void HttpMessage::BuildCgiRespond(int respCode, const std::string & sRespMsg, const std::string & sRespBody, SimpleBuffer & outBuffer)
+void HttpMessage::BuildCgiRespond(int respCode, const std::string & sRespMsg, const std::string & sContentType, const std::string & sRespBody, SimpleBuffer & outBuffer)
 {
 	outBuffer.Append("HTTP/1.1 %d %s\r\n", respCode, sRespMsg.c_str());
-	outBuffer.Append("Content-Type: text/html\r\n");
+	outBuffer.Append("Content-Type: %s\r\n", sContentType.c_str());
 	outBuffer.Append("Connection: keep-alive\r\n");
 	outBuffer.Append("Server: Lufan's Web Server\r\n");
 	
@@ -235,6 +262,6 @@ void HttpMessage::BuildCgiRespond(int respCode, const std::string & sRespMsg, co
 	{
 		outBuffer.Append("Content-Length: %d\r\n", static_cast<int>(sRespBody.size()));
 		outBuffer.Append("\r\n");
-		outBuffer.Append("%s", sRespBody.c_str());
+		outBuffer.WriteToBuffer(sRespBody.data(), sRespBody.size());
 	}
 }

@@ -1,6 +1,6 @@
 #include "simplebuffer.h"
 
-const size_t SimpleBuffer::kReadOrWriteFromFdSize = 1024;
+const size_t SimpleBuffer::kReadOrWriteFromFdSize = 4096;
 
 SimpleBuffer::SimpleBuffer() : m_buffer(NULL), m_allocSize(0), m_readOffset(0), m_writeOffset(0)
 {
