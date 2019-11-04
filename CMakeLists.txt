@@ -19,6 +19,7 @@ add_executable(eventloop simplebuffer.cpp httpmessage.cpp epoller.cpp channel.cp
 add_executable(netutil netutil.cpp test/netutil_test.cpp)
 add_executable(tcpserver simplebuffer.cpp httpmessage.cpp epoller.cpp channel.cpp eventloop.cpp netutil.cpp tcpserver.cpp test/tcpserver_test.cpp)
 add_executable(httpcgiserver simplebuffer.cpp httpmessage.cpp epoller.cpp channel.cpp eventloop.cpp netutil.cpp tcpserver.cpp basecgi.cpp exampleCgi/examplecgi.cpp loginCgi/logincgi.cpp cgidispatch.cpp httpcgiserver.cpp test/httpcgiserver_test.cpp)
+add_executable(httpcgiservermain simplebuffer.cpp httpmessage.cpp epoller.cpp channel.cpp eventloop.cpp netutil.cpp tcpserver.cpp basecgi.cpp exampleCgi/examplecgi.cpp loginCgi/logincgi.cpp cgidispatch.cpp httpcgiserver.cpp httpcgiservermain.cpp)
 
 target_link_libraries(epoller ${CMAKE_CURRENT_SOURCE_DIR}/libasynclogStaticLib.a  -lpthread)
 target_link_libraries(channel ${CMAKE_CURRENT_SOURCE_DIR}/libasynclogStaticLib.a  -lpthread)
@@ -26,3 +27,4 @@ target_link_libraries(eventloop ${CMAKE_CURRENT_SOURCE_DIR}/libasynclogStaticLib
 target_link_libraries(netutil ${CMAKE_CURRENT_SOURCE_DIR}/libasynclogStaticLib.a  -lpthread)
 target_link_libraries(tcpserver ${CMAKE_CURRENT_SOURCE_DIR}/libasynclogStaticLib.a  -lpthread)
 target_link_libraries(httpcgiserver ${CMAKE_CURRENT_SOURCE_DIR}/libasynclogStaticLib.a  -lpthread)
+target_link_libraries(httpcgiservermain ${CMAKE_CURRENT_SOURCE_DIR}/libasynclogStaticLib.a  -lpthread)

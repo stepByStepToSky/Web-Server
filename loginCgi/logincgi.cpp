@@ -1,4 +1,6 @@
 #include <fstream>
+#include <string>
+#include <algorithm>
 
 #include "logincgi.h"
 #include "../httpmessage.h"
@@ -9,9 +11,10 @@ static void ReadFile(std::string sPath, std::string & sRespond)
 	is.seekg(0, is.end);
 	int flength = is.tellg();
 	is.seekg(0, is.beg);
-	char * buffer = new char[flength];
-	is.read(buffer, flength);
-	sRespond.assign(buffer, flength);
+	flength = std::max(flength, 1);
+	std::string buffer(flength);
+	is.read(&buffer[0], flength);
+	sRespond.assign(buffer.data(), flength);
 }
 
 void LoginCgi::ProcessImp(int & respondCode, std::string sRespMsg, std::string & sContentType, std::string & sRespBoby)
