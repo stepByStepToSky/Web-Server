@@ -1,7 +1,7 @@
 ## Web-Server
 
 ## Introduction   
-An implementation of HTTP server based on **c++11**, which is easily to add a cgi instance. It can handle static resources, support HTTP long connections, and so on. We also implement the [Asynchronous Log](https://github.com/stepByStepToSky/ThreadPool-and-Asynchronous-log) to record the status of the server.
+An implementation of HTTP server based on **c++11**, which is easily to add a Cgi instance. It can handle static resources, support HTTP long connections, and so on. We also implement the [Asynchronous Log](https://github.com/stepByStepToSky/ThreadPool-and-Asynchronous-log) to record the status of the server.
 
 Test page ：[ExampleCgi](http://106.54.211.174:9508/cgi-bin/example?name=lufan&id=2021) and [LoginCgi](http://106.54.211.174:9508/cgi-bin/login).
 
@@ -30,7 +30,7 @@ d) Modify the [CMakeLists.txt](https://github.com/stepByStepToSky/Web-Server/blo
 e) Then build and run.
 
 ## Repository contents
-See implDoc.md for a brief overview of the implementation.
+See [implDoc.md](https://github.com/stepByStepToSky/Web-Server/blob/master/implDoc.md) for a brief overview of the implementation.
 Guide to header files:
 - **base/log.h** Interface for log system, which is from [Asynchronous Log](https://github.com/stepByStepToSky/ThreadPool-and-Asynchronous-log).
 
