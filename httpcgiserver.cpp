@@ -70,7 +70,7 @@ void HttpCgiServer::ErrorCallback(std::shared_ptr<Channel> ptChannel)
 	
 }
 
-HttpCgiServer::HttpCgiServer(const char * serverIp, uint16_t port) : m_tcpServer(serverIp, port)
+HttpCgiServer::HttpCgiServer(const char * serverIp, uint16_t port,  int threadCnt /* = 0 */) : m_tcpServer(serverIp, port, threadCnt)
 {
 	using namespace std::placeholders;
 	m_tcpServer.SetReadCallback(std::bind(&HttpCgiServer::ReadRequestCallback, this, _1));

@@ -13,7 +13,7 @@
 class HttpCgiServer
 {
 public:
-	HttpCgiServer(const char * serverIp, uint16_t port);
+	HttpCgiServer(const char * serverIp, uint16_t port, int threadCnt = 0);
 	
 	int ReadRequestCallback(std::shared_ptr<Channel> ptChannel);
 	void WriteCallback(std::shared_ptr<Channel> ptChannel);

@@ -10,6 +10,7 @@
 #include "eventloop.h"
 #include "channel.h"
 #include "base/log.h"
+#include "eventloopthreadpool.h"
 
 class TcpServer
 {
@@ -21,7 +22,7 @@ public:
 	// else return 1
 	typedef std::function<int (std::shared_ptr<Channel>)> ReadCallbackType;
 	
-	TcpServer(const char * serverIp, uint16_t port);
+	TcpServer(const char * serverIp, const uint16_t port, int threadCnt = 0);
 	~TcpServer();
 	
 	void SetReadCallback(ReadCallbackType readCallback);
@@ -39,6 +40,7 @@ private:
 	int m_listenFd;
 	ChannelPtr m_ptListenChannel;
 	EventLoop m_eventLoop;
+	EventLoopThreadPool m_eventThreadPool;
 	ReadCallbackType m_readCallback;
 	CallbackType m_writeCallback;
 	CallbackType m_errorCallback;

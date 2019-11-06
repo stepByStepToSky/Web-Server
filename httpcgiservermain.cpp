@@ -15,6 +15,6 @@ void SignalHandler ( void )
 int main()
 {
 	SignalHandler();
-	HttpCgiServer cgiServer(servIp, port);
+	HttpCgiServer cgiServer(servIp, port, 3);
 	cgiServer.Loop();
 }

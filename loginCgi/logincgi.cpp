@@ -12,7 +12,8 @@ static void ReadFile(std::string sPath, std::string & sRespond)
 	int flength = is.tellg();
 	is.seekg(0, is.beg);
 	flength = std::max(flength, 1);
-	std::string buffer(flength);
+	std::string buffer;
+	buffer.resize(flength);
 	is.read(&buffer[0], flength);
 	sRespond.assign(buffer.data(), flength);
 }

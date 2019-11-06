@@ -102,11 +102,19 @@ void TcpServer::NewConnectReadHandler(EventLoop & eventLoop, std::shared_ptr<Cha
 		uint16_t port = ntohs(peerAddr.sin_port);
 		DEBUGLOG("%s %s %d, accept new socket, socket=%d from %s:%d", __FILE__, __func__, __LINE__, fd, ipStr, port);
 		
-		using namespace std::placeholders;
-		ptConnChannel->SetReadCallback(std::bind(&TcpServer::ReadFromFdToBuffer, this, _1, _2));
-		ptConnChannel->SetWriteCallback(std::bind(&TcpServer::WriteFromBufferToFd, this, _1, _2));
-		ptConnChannel->SetErrorCallback(std::bind(&TcpServer::ErrorCallBack, this, _1, _2));
-		m_eventLoop.AddChannel(ptConnChannel, EPOLLIN);
+		if (m_eventThreadPool.Empty())
+		{
+			using namespace std::placeholders;
+			ptConnChannel->SetReadCallback(std::bind(&TcpServer::ReadFromFdToBuffer, this, _1, _2));
+			ptConnChannel->SetWriteCallback(std::bind(&TcpServer::WriteFromBufferToFd, this, _1, _2));
+			ptConnChannel->SetErrorCallback(std::bind(&TcpServer::ErrorCallBack, this, _1, _2));
+			m_eventLoop.AddChannel(ptConnChannel, EPOLLIN);
+		}
+		else
+		{
+			m_eventThreadPool.PushFd(fd);
+		}
+		
 		
 		peerAddrLen = 1; // to avoid accept(): Invalid Argument
 	}
@@ -115,7 +123,9 @@ void TcpServer::NewConnectReadHandler(EventLoop & eventLoop, std::shared_ptr<Cha
 }
 
 
-TcpServer::TcpServer(const char * serverIp, uint16_t port) : m_listenFd(NetUtil::Listen(serverIp, port)), m_ptListenChannel(new Channel(m_listenFd))
+TcpServer::TcpServer(const char * serverIp, const uint16_t port, int threadCnt /* = 0 */) : m_listenFd(NetUtil::Listen(serverIp, port)),
+																			m_eventThreadPool(threadCnt),
+																			m_ptListenChannel(new Channel(m_listenFd))
 {
 	using namespace std::placeholders;
 	m_ptListenChannel->SetReadCallback(std::bind(&TcpServer::NewConnectReadHandler, this, _1, _2));
@@ -129,6 +139,11 @@ TcpServer::~TcpServer()
 
 void TcpServer::Loop()
 {
+	using namespace std::placeholders;
+	m_eventThreadPool.SetReadCallback(std::bind(&TcpServer::ReadFromFdToBuffer, this, _1, _2));
+	m_eventThreadPool.SetWriteCallback(std::bind(&TcpServer::WriteFromBufferToFd, this, _1, _2));
+	m_eventThreadPool.SetErrorCallback(std::bind(&TcpServer::ErrorCallBack, this, _1, _2));
+	m_eventThreadPool.Loop();
 	m_eventLoop.Loop();
 }
 
