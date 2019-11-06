@@ -1,0 +1,4 @@
+- 使用Epoll水平触发的IO多路复用技术，非阻塞IO，使用Reactor模式，接口设计参考[muduo](https://github.com/chenshuo/muduo)和[libevent](https://github.com/libevent/libevent)
+- 参考[muduo](https://github.com/chenshuo/muduo)，使用双缓冲区技术实现异步日志系统
+- 使用智能指针等RAII机制管理资源
+- 使用状态机解析了HTTP请求,支持管线化
