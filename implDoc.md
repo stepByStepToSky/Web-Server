@@ -1,4 +1,5 @@
 - 使用Epoll水平触发的IO多路复用技术，非阻塞IO，使用Reactor模式，接口设计参考[muduo](https://github.com/chenshuo/muduo)和[libevent](https://github.com/libevent/libevent)
 - 参考[muduo](https://github.com/chenshuo/muduo)，使用双缓冲区技术实现异步日志系统
+- 参考[memcached](https://github.com/memcached/memcached/blob/master/memcached.c)的网络模型，主线程只负责accept请求，并以Round Robin的方式分发给其它IO线程，锁的争用只会出现在主线程和某一特定线程中，使用管道唤醒IO线程
 - 使用智能指针等RAII机制管理资源
 - 使用状态机解析了HTTP请求,支持管线化
