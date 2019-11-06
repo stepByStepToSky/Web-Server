@@ -39,8 +39,8 @@ Guide to header files:
 - **simplebuffer.h** Application layer buffer(we only implement the LT model now).
 - **channel.h** Encapsulate channel(event) related callback functions (read/write/error functions).
 - **eventloop.h** It manages the channel(event), which is registed to the epoller, and process the active channels(events).
-- **eventloopthread.h** It manage a connect queue, and the main accept thread push connection socket fd into the queue, this thread and the socket fds to its eventLoop.
-- **eventloopthreadpool.h** It manage several threads, the main accept thread push connection socket fd into the threadpool, it dispatch the socket to its threads.
+- **eventloopthread.h** It manage a connect queue, and the main accept thread push connection socket fd into the queue, then this thread add the socket fds to its eventLoop.
+- **eventloopthreadpool.h** It manage several threads, the main accept thread push connection socket fd into the threadpool, it dispatches the socket to its threads.
 - **tcpserver.h** Accept connection socket fd, and when a read event happends on the connection socket, it automatically read the byte stream into the application buffer of the channel, and execute the read callback function. The same as write and error events happend.
 - **httpmessage.h** Parse the HTTP request, build HTTP respond message. Here, we use a state machine to process HTTP requests.
 - **basecgi.h** The abstract class of Cgi instance class. It provides a Process interface, we use it to process the cgi request.
