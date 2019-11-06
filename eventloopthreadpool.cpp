@@ -15,12 +15,18 @@ void EventLoopThreadPool::PushFd(int fd)
 {
 	m_robinIndex %= m_threadCnt;
 	m_eventLoopThreads[m_robinIndex]->PushFd(fd);
+	DEBUGLOG("%s %s %d, EventLoopThread threadId=%d is going to process the connection fd=%d", __FILE__, __func__, __LINE__, m_robinIndex, fd);
 	m_robinIndex += 1;
+}
+
+int EventLoopThreadPool::GetThreadCnt()
+{
+	return m_threadCnt;
 }
 
 bool EventLoopThreadPool::Empty()
 {
-	0 == m_threadCnt;
+	return 0 == m_threadCnt;
 }
 
 void EventLoopThreadPool::RunInThread(int threadId)
@@ -30,6 +36,8 @@ void EventLoopThreadPool::RunInThread(int threadId)
 	eventLoopThread.SetReadCallback(m_readCallback);
 	eventLoopThread.SetWriteCallback(m_writeCallback);
 	eventLoopThread.SetErrorCallback(m_errorCallback);
+	eventLoopThread.SetThreadId(threadId);
+	DEBUGLOG("%s %s %d, EventLoopThread threadId=%d Loop is going to start", __FILE__, __func__, __LINE__, threadId);
 	eventLoopThread.Loop();
 }
 

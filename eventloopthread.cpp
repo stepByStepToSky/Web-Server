@@ -1,9 +1,11 @@
 #include "eventloopthread.h"
 #include "base/log.h"
 
-EventLoopThread::EventLoopThread() : m_listenChannel(std::make_shared<Channel>(m_pipeFd[0])), m_vecQue(16)
+EventLoopThread::EventLoopThread()
 {
-	pipe(m_pipeFd);
+	pipe2(m_pipeFd, O_CLOEXEC | O_NONBLOCK);
+	m_listenChannel = std::make_shared<Channel>(m_pipeFd[0]);
+	m_vecQue.reserve(32);
 }
 
 EventLoopThread::~EventLoopThread()
@@ -27,6 +29,7 @@ void EventLoopThread::OnReadHandler(EventLoop & eventLoop, std::shared_ptr<Chann
 		ptChannel->SetWriteCallback(m_writeCallback);
 		ptChannel->SetErrorCallback(m_errorCallback);
 		m_eventLoop.AddChannel(ptChannel, EPOLLIN);
+		DEBUGLOG("%s %s %d, EventLoopThread threadId=%d add socket fd=%d", __FILE__, __func__, __LINE__, m_threadId, m_vecQue[i]);
 	}
 	m_vecQue.clear();
 }
@@ -43,10 +46,7 @@ void EventLoopThread::PushFd(int fd)
 {
 	LockGuard lock(m_mutex);
 	m_vecQue.push_back(fd);
-	if (1 == m_vecQue.size())
-	{
-		write(m_pipeFd[0], " ", 1);
-	}
+	write(m_pipeFd[1], " ", 1);
 }
 
 void EventLoopThread::SetReadCallback(CallbackType readCallback)
@@ -67,4 +67,9 @@ void EventLoopThread::SetErrorCallback(CallbackType errorCallback)
 void EventLoopThread::Quit()
 {
 	m_eventLoop.Quit();
+}
+
+void EventLoopThread::SetThreadId(int threadId)
+{
+	m_threadId = threadId;
 }

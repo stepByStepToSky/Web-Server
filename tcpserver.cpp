@@ -104,6 +104,7 @@ void TcpServer::NewConnectReadHandler(EventLoop & eventLoop, std::shared_ptr<Cha
 		
 		if (m_eventThreadPool.Empty())
 		{
+			ERRLOG("%s %s %d, m_eventThreadPool.GetThreadCnt()=%d", __FILE__, __func__, __LINE__, (int)(m_eventThreadPool.GetThreadCnt()));
 			using namespace std::placeholders;
 			ptConnChannel->SetReadCallback(std::bind(&TcpServer::ReadFromFdToBuffer, this, _1, _2));
 			ptConnChannel->SetWriteCallback(std::bind(&TcpServer::WriteFromBufferToFd, this, _1, _2));
@@ -112,14 +113,14 @@ void TcpServer::NewConnectReadHandler(EventLoop & eventLoop, std::shared_ptr<Cha
 		}
 		else
 		{
+			ERRLOG("%s %s %d, m_eventThreadPool.GetThreadCnt()=%d", __FILE__, __func__, __LINE__, (int)(m_eventThreadPool.GetThreadCnt()));
 			m_eventThreadPool.PushFd(fd);
 		}
-		
 		
 		peerAddrLen = 1; // to avoid accept(): Invalid Argument
 	}
 	
-	ERRLOG("%s %s %d, m_listenFd=%d, listen error. %s", __FILE__, __func__, __LINE__, m_listenFd, strerror(errno));
+	//ERRLOG("%s %s %d, m_listenFd=%d, listen error. %s", __FILE__, __func__, __LINE__, m_listenFd, strerror(errno));
 }
 
 

@@ -24,6 +24,7 @@ public:
 	void PushFd(int fd);
 	void Loop();
 	void Quit();
+	int GetThreadCnt();
 	bool Empty();
 	
 private:

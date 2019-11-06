@@ -6,6 +6,7 @@
 #include <vector>
 #include <functional>
 #include <unistd.h>
+#include <fcntl.h>
 #include <arpa/inet.h>
 #include "base/mutex.h"
 #include "channel.h"
@@ -26,6 +27,7 @@ public:
 	void SetReadCallback(CallbackType readCallback);
 	void SetWriteCallback(CallbackType writeCallback);
 	void SetErrorCallback(CallbackType errorCallback);
+	void SetThreadId(int threadId);
 	
 	void PushFd(int fd);
 	void Loop();
@@ -35,7 +37,7 @@ private:
 	void OnReadHandler(EventLoop & eventLoop, std::shared_ptr<Channel> ptChannel);
 	
 private:
-	int m_pipeFd[2];	// to arouse the sub-thread to add socket fd in m_vecQue, EPOLLIN event in m_eventloop
+	int m_pipeFd[2];	// to arouse the sub-thread to add socket fd in m_vecQue to m_eventloop with EPOLLIN event
 	ChannelPtr m_listenChannel;
 	Mutex m_mutex;		// protected the m_vecQue
 	std::vector<int> m_vecQue;
@@ -43,6 +45,7 @@ private:
 	CallbackType m_readCallback;
 	CallbackType m_writeCallback;
 	CallbackType m_errorCallback;
+	int m_threadId;
 };
 
 #endif
