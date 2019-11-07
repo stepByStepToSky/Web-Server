@@ -44,6 +44,8 @@ private:
 	ReadCallbackType m_readCallback;
 	CallbackType m_writeCallback;
 	CallbackType m_errorCallback;
+	
+	static const int kMaxConnectionCnt;
 };
 
 #endif

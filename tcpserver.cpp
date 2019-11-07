@@ -4,6 +4,9 @@
 #include "tcpserver.h"
 #include "netutil.h"
 
+
+const int TcpServer::kMaxConnectionCnt = 10000;
+
 void TcpServer::ReadFromFdToBuffer(EventLoop & eventLoop, std::shared_ptr<Channel> ptChannel)
 {
 	SimpleBuffer & inBuffer = ptChannel->GetInBuffer();
@@ -84,6 +87,13 @@ void TcpServer::NewConnectReadHandler(EventLoop & eventLoop, std::shared_ptr<Cha
 	
 	while(-1 != (fd = accept(m_listenFd, reinterpret_cast<struct sockaddr*>(&peerAddr), &peerAddrLen)))
 	{
+		// limit connection nums
+		if (kMaxConnectionCnt < fd)
+		{
+			close(fd);
+			continue;
+		}
+		
 		NetUtil::SetNonblock(fd);
 		NetUtil::SetNoDelay(fd);
 		ChannelPtr ptConnChannel(new Channel(fd));
