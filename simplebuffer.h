@@ -47,6 +47,11 @@ public:
 	// FIX ME, change to KMP algorithm
 	ssize_t Find(const char * src);
 	
+	// note that strlen(src) must > 0
+	bool EndWith(const char * src);
+	bool EndWithBackEndLength(const char * src, size_t length);
+	void DropEnd(size_t n);
+	
 private:
 	static const size_t kReadOrWriteFromFdSize;
 	

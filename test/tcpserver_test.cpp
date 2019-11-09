@@ -49,7 +49,7 @@ int ReadCallback(std::shared_ptr<Channel> ptChannel)
 	
 	const char * respond = "HTTP/1.1 200 OK\r\nContent-type: text/plain\r\nContent-Length:13\r\n\r\nHello World\r\n";
 	outBuffer.WriteToBuffer(respond, strlen(respond));
-	return 0;
+	return 1;
 }
 
 void WriteCallback(std::shared_ptr<Channel> ptChannel)

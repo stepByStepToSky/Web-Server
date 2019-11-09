@@ -6,5 +6,6 @@
 #include "basecgi.h"
 #include "exampleCgi/examplecgi.h"
 #include "loginCgi/logincgi.h"
+#include "uploadFileCgi/uploadfilecgi.h"
 
 #endif

@@ -18,8 +18,8 @@ add_executable(channel simplebuffer.cpp httpmessage.cpp channel.cpp test/channel
 add_executable(eventloop simplebuffer.cpp httpmessage.cpp epoller.cpp channel.cpp eventloop.cpp test/eventloop_test.cpp)
 add_executable(netutil netutil.cpp test/netutil_test.cpp)
 add_executable(tcpserver simplebuffer.cpp httpmessage.cpp epoller.cpp channel.cpp eventloop.cpp eventloopthread.cpp eventloopthreadpool.cpp netutil.cpp tcpserver.cpp test/tcpserver_test.cpp)
-add_executable(httpcgiserver simplebuffer.cpp httpmessage.cpp epoller.cpp channel.cpp eventloop.cpp eventloopthread.cpp eventloopthreadpool.cpp netutil.cpp tcpserver.cpp basecgi.cpp exampleCgi/examplecgi.cpp loginCgi/logincgi.cpp cgidispatch.cpp httpcgiserver.cpp test/httpcgiserver_test.cpp)
-add_executable(httpcgiservermain simplebuffer.cpp httpmessage.cpp epoller.cpp channel.cpp eventloop.cpp eventloopthread.cpp eventloopthreadpool.cpp netutil.cpp tcpserver.cpp basecgi.cpp exampleCgi/examplecgi.cpp loginCgi/logincgi.cpp cgidispatch.cpp httpcgiserver.cpp httpcgiservermain.cpp)
+add_executable(httpcgiserver simplebuffer.cpp httpmessage.cpp epoller.cpp channel.cpp eventloop.cpp eventloopthread.cpp eventloopthreadpool.cpp netutil.cpp tcpserver.cpp basecgi.cpp exampleCgi/examplecgi.cpp loginCgi/logincgi.cpp uploadFileCgi/uploadfilecgi.cpp cgidispatch.cpp httpcgiserver.cpp test/httpcgiserver_test.cpp)
+add_executable(httpcgiservermain simplebuffer.cpp httpmessage.cpp epoller.cpp channel.cpp eventloop.cpp eventloopthread.cpp eventloopthreadpool.cpp netutil.cpp tcpserver.cpp basecgi.cpp exampleCgi/examplecgi.cpp loginCgi/logincgi.cpp uploadFileCgi/uploadfilecgi.cpp cgidispatch.cpp httpcgiserver.cpp httpcgiservermain.cpp)
 
 target_link_libraries(epoller ${CMAKE_CURRENT_SOURCE_DIR}/libasynclogStaticLib.a  -lpthread)
 target_link_libraries(channel ${CMAKE_CURRENT_SOURCE_DIR}/libasynclogStaticLib.a  -lpthread)

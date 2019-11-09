@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+  <meta charset="UTF-8">
+  <title>Example</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <link rel="stylesheet" href="https://cdn.bootcss.com/amazeui/2.7.2/css/amazeui.min.css" />
+</head>
+
+<body>
+  <br>
+  <div class="am-u-lg-6 am-u-md-8 am-u-sm-centered">
+    <form class="am-form-group am-form-file am-fl" enctype="multipart/form-data" id="form">
+      <button type="button" class="am-btn am-btn-warning">
+        <i class="am-icon-cloud-upload"></i>选择文件</button>
+      <input id="doc-form-file" type="file" name="file">
+      <div id="file-list"></div>
+    </form>
+    <p>
+      <button type="button" class="am-btn am-btn-warning am-fr" id="button" onclick="submit();">上传</button>
+    </p>
+    <p id="image">
+    </p>
+  </div>
+</body>
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script type="text/javascript">
+  $("#doc-form-file").on("change", function() {
+    var fileNames = "";
+    $.each(this.files, function() {
+      fileNames = "<span class=\"am-badge\">" + this.name + "</span>";
+      var freader = new FileReader();
+      freader.onload = function(e) {
+        $("#image")[0].innerHTML = "<img src=\"" + e.target.result + "\" class=\"am-img-responsive\"/>";
+      }
+      freader.readAsDataURL(this);
+    });
+    $("#file-list").html(fileNames);
+  });
+
+  /*
+  发出去的格式为: multipart/form-data
+  其中file: 上传的文件
+  接收一个文件网址
+  */
+  function submit() {
+    var form = new FormData($("#form")[0]);
+	var myfile = document.getElementById('doc-form-file');
+	
+    $.ajax({
+      url: "http://127.0.0.1:9508/cgi-bin/uploadfile?fileName=" + myfile.files[0].name, //@TODO 地址填上
+      type: "post",
+      data: form,
+      processData: false,
+      contentType: false,
+      success: function(data) {
+        alert('上传成功');
+      },
+      error: function(xhr, type) {
+        alert('上传失败!');
+	  }
+    });
+  }
+</script>
+
+</html>

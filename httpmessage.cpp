@@ -27,7 +27,7 @@ HttpMessage::ContentTypeMapType & HttpMessage::GetContentTypeMap()
 	return m_contentTypeMap;
 }
 
-HttpMessage::HttpMessage() : m_parseStage(ParseRequestLine)
+HttpMessage::HttpMessage() : m_parseStage(ParseRequestLine), m_parseMultiFormStage(Boundary)
 {
 	
 }
@@ -178,10 +178,20 @@ HttpMessage::ParseState HttpMessage::Parse(SimpleBuffer & inBuffer)
 			if ("POST" == m_method)
 			{
 				m_parseStage = ParseRequestBody;
+				HeadMapType::iterator iter = m_headContent.find("Content-Length");
+				if (m_headContent.end() == iter)
+				{
+					ERRLOG("%s %s %d, post method has no Content-Length information", __FILE__, __func__, __LINE__);
+					m_respondCode = BadReq;
+					m_respondMsg = "Bad request";
+					return Error;
+				}
+				m_realDataContentLength = static_cast<size_t>(std::max(0, std::stoi(iter->second)));
 				break;
 			}
 			else
 			{
+				DEBUGLOG("%s %s %d, parse request done", __FILE__, __func__, __LINE__);
 				return Done;
 			}
 		}
@@ -204,30 +214,116 @@ HttpMessage::ParseState HttpMessage::Parse(SimpleBuffer & inBuffer)
 	
 	if (ParseRequestBody == m_parseStage)
 	{
-		HeadMapType::iterator iter = m_headContent.find("Content-Length");
-		if (m_headContent.end() == iter)
-		{
-			ERRLOG("%s %s %d, post method has no Content-Length information", __FILE__, __func__, __LINE__);
-			m_respondCode = BadReq;
-			m_respondMsg = "Bad request";
-			return Error;
-		}
-		
-		size_t contentLength = static_cast<size_t>(std::max(0, std::stoi(iter->second)));
-		if (contentLength > inBuffer.BufferSize())	// body content is imcomplete
+		if (m_realDataContentLength > inBuffer.BufferSize())	// body content is imcomplete
 		{
 			return Again;
 		}
 		
-		m_bodyStr.assign(inBuffer.Buffer(), contentLength);
+		const std::string & sContentType = m_headContent["Content-Type"];
+		static const char multiPartFormDataArray[] = "multipart/form-data";
+		if (!(sizeof(multiPartFormDataArray) - 1 <= sContentType.size() && 0 == sContentType.compare(0, sizeof(multiPartFormDataArray) - 1, multiPartFormDataArray, sizeof(multiPartFormDataArray) - 1)))
+		{
+			DEBUGLOG("%s %s %d, it is not multipart/form-data request", __FILE__, __func__, __LINE__);
+			m_bodyStr.assign(inBuffer.Buffer(), m_realDataContentLength);
+			inBuffer.ReadFromBuffer(m_realDataContentLength);
+		}
+		else
+		{
+			DEBUGLOG("%s %s %d, it is multipart/form-data request", __FILE__, __func__, __LINE__);
+			if (Boundary == m_parseMultiFormStage)
+			{
+				ssize_t pos = inBuffer.Find("\r\n");
+				if (-1 == pos)
+				{
+					return Again;
+				}
+				std::string sBoundary(inBuffer.Buffer(), pos);
+				sBoundary.append("--\r\n");
+				m_headContent.insert(std::make_pair("boundary", sBoundary));
+				inBuffer.ReadFromBuffer(pos + 2);
+				m_realDataContentLength -= (pos + 2);
+				DEBUGLOG("%s %s %d, multipart/form-data request parse boundry success, stage=%d, pos=%d, sBoundary=%s", __FILE__, __func__, __LINE__, m_parseMultiFormStage, pos, sBoundary.c_str());
+				m_parseMultiFormStage = ContentDisposition;
+			}
+			
+			if (ContentDisposition == m_parseMultiFormStage)
+			{
+				ssize_t pos = inBuffer.Find("\r\n");
+				if (0 < pos)
+				{
+					inBuffer.ReadFromBuffer(pos + 2);
+					m_realDataContentLength -= (pos + 2);
+					pos = inBuffer.Find("\r\n");
+					DEBUGLOG("%s %s %d, multipart/form-data request parse content disposition 1 success, stage=%d, pos=%d", __FILE__, __func__, __LINE__, m_parseMultiFormStage, pos);
+				}
+				
+				if (-1 == pos)
+				{
+					return Again;
+				}
+				else if (0 < pos)
+				{
+					inBuffer.ReadFromBuffer(pos + 2);
+					m_realDataContentLength -= (pos + 2);
+					m_parseMultiFormStage = DataContentTypeEnd;
+				}
+				
+				DEBUGLOG("%s %s %d, multipart/form-data request parse content disposition 2 success, stage=%d, pos=%d", __FILE__, __func__, __LINE__, m_parseMultiFormStage, pos);
+			}
+			DEBUGLOG("%s %s %d, multipart/form-data request parse content disposition success, stage=%d", __FILE__, __func__, __LINE__, m_parseMultiFormStage);
+			
+			if (DataContentTypeEnd == m_parseMultiFormStage)
+			{
+				ssize_t pos = inBuffer.Find("\r\n");	//	"\r\n"
+				if (-1 == pos)
+				{
+					return Again;
+				}
+				inBuffer.ReadFromBuffer(pos + 2);
+				m_realDataContentLength -= (pos + 2);
+				m_parseMultiFormStage = RealBodyData;
+			}
+			DEBUGLOG("%s %s %d, multipart/form-data request parse content type success, stage=%d", __FILE__, __func__, __LINE__, m_parseMultiFormStage);
+			
+			if (RealBodyData == m_parseMultiFormStage)
+			{	
+				// support multipart/form-data
+				bool isBoundaryEnd = inBuffer.EndWithBackEndLength("--\r\n", m_realDataContentLength);
+				if (isBoundaryEnd)
+				{
+					const std::string & sBoundary = m_headContent["boundary"];
+					isBoundaryEnd = inBuffer.EndWithBackEndLength(sBoundary.c_str(), m_realDataContentLength);
+					if (isBoundaryEnd)
+					{
+						DEBUGLOG("%s %s %d, multipart/form-data request parse success, stage=%d, sBoundary=%s", __FILE__, __func__, __LINE__, m_parseMultiFormStage, sBoundary.c_str());
+						m_parseMultiFormStage = RealDone;
+						//inBuffer.DropEnd(sBoundary.size() + 2);	// drop \r\n and the final boundary
+						m_bodyStr.assign(inBuffer.Buffer(), m_realDataContentLength - sBoundary.size() - 2);
+						inBuffer.ReadFromBuffer(m_realDataContentLength);
+						return Done;
+					}
+				}
+				
+				if (inBuffer.BufferSize() > std::stoi(m_headContent["Content-Length"]))
+				{
+					ERRLOG("%s %s %d, post method has no Content-Length information", __FILE__, __func__, __LINE__);
+					m_respondCode = BadReq;
+					m_respondMsg = "Bad request";
+					return Error;
+				}
+				return Again;
+			}
+			DEBUGLOG("%s %s %d, multipart/form-data request parse real body success, stage=%d", __FILE__, __func__, __LINE__, m_parseMultiFormStage);
+		}
 	}
-	
+	DEBUGLOG("%s %s %d, parse request done", __FILE__, __func__, __LINE__);
 	return Done;
 }
 
 void HttpMessage::Reset()
 {
 	m_parseStage = ParseRequestLine;
+	m_parseMultiFormStage = Boundary;
 	HeadMapType tempHeadMap;
 	m_headContent.swap(tempHeadMap);
 }

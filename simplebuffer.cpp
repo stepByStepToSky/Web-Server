@@ -188,3 +188,43 @@ ssize_t SimpleBuffer::Find(const char * src)
 	}
 	return -1;
 }
+
+bool SimpleBuffer::EndWith(const char * src)
+{
+	const size_t srcLen = strlen(src);
+	for (size_t i = 0; i < srcLen && i < BufferSize(); ++i)
+	{
+		if (src[srcLen - 1 - i] != m_buffer[m_writeOffset - 1 - i])
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+bool SimpleBuffer::EndWithBackEndLength(const char * src, size_t length)
+{
+	if (length > BufferSize())
+	{
+		return false;
+	}
+	
+	const size_t srcLen = strlen(src);
+	size_t bufferEnd = m_readOffset + length;
+	for (size_t i = 0; i < srcLen && i < BufferSize(); ++i)
+	{
+		if (src[srcLen - 1 - i] != m_buffer[bufferEnd - 1 - i])
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+void SimpleBuffer::DropEnd(size_t n)
+{
+	if (n <= BufferSize())
+	{
+		m_writeOffset -= n;
+	}
+}

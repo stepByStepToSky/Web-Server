@@ -38,6 +38,14 @@ public:
 		MeNotIm = 501	// method not implement
 	};
 	
+	enum MultiPartFormDataParse
+	{
+		Boundary = 1000,
+		ContentDisposition,
+		DataContentTypeEnd,
+		RealBodyData,
+		RealDone
+	};
 	
 public:
 	HttpMessage();
@@ -60,6 +68,7 @@ public:
 	
 private:
 	ParseRequestType m_parseStage;
+	MultiPartFormDataParse m_parseMultiFormStage;
 	RespondType m_respondCode;
 	std::string m_respondMsg;
 	std::string m_method;
@@ -67,7 +76,7 @@ private:
 	std::string m_httpVersion;
 	HeadMapType m_headContent;
 	std::string m_bodyStr;
-	
+	size_t m_realDataContentLength;
 	static ContentTypeMapType m_contentTypeMap;
 };
 

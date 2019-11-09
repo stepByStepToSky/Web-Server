@@ -18,4 +18,5 @@ void BaseFactory::Init()
 {
 	AddCgiInstanceFactory<ExampleCgi>("/cgi-bin/example");
 	AddCgiInstanceFactory<LoginCgi>("/cgi-bin/login");
+	AddCgiInstanceFactory<UploadFileCgi>("/cgi-bin/uploadfile");
 }
