@@ -1,5 +1,5 @@
 #include "log.h"
-
+#include <ctime>
 
 LogManager::LogManager()
 {
@@ -26,6 +26,14 @@ void ERRLOGImpl(const char * errMsg)
 	char buff[1024];
 	memcpy(buff, "ERROR: ", 7);
 	size_t writeSize = 7;
+	
+	time_t now = time(0);
+	char* dt = ctime(&now);
+	size_t cTimeLen = strlen(dt);
+	dt[cTimeLen - 1] = ' ';
+	memcpy(buff + writeSize, dt, cTimeLen);
+	writeSize += cTimeLen;
+	
 	size_t nErrmsg = strlen(errMsg);
 	memcpy(buff + writeSize, errMsg, nErrmsg);
 	writeSize += nErrmsg;
@@ -41,6 +49,14 @@ void DEBUGLOGImpl(const char * debugMsg)
 	char buff[1024];
 	memcpy(buff, "DEBUG: ", 7);
 	size_t writeSize = 7;
+	
+	time_t now = time(0);
+	char* dt = ctime(&now);
+	size_t cTimeLen = strlen(dt);
+	dt[cTimeLen - 1] = ' ';
+	memcpy(buff + writeSize, dt, cTimeLen);
+	writeSize += cTimeLen;
+	
 	size_t nErrmsg = strlen(debugMsg);
 	memcpy(buff + writeSize, debugMsg, nErrmsg);
 	writeSize += nErrmsg;
