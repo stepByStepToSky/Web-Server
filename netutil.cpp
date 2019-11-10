@@ -2,6 +2,8 @@
 #include "base/log.h"
 
 
+#define IP_SIZE 16
+
 int NetUtil::Listen(const char * serverIp, uint16_t port)
 {
 	int fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -85,5 +87,24 @@ void NetUtil::SetAddr(const char * serverIp, uint16_t port, struct sockaddr_in &
 	if (1 != inet_pton(AF_INET, serverIp, &sockAddr.sin_addr))
 	{
 		ERRLOG("%s %s %d, set server address error. %s", __FILE__, __func__, __LINE__, strerror(errno));
+	}
+}
+
+void NetUtil::GetIpByDomain(const char * domain, std::vector<std::string> & vecIp)
+{
+	struct hostent * hptr = gethostbyname(domain);
+	if (NULL == hptr)
+	{
+		ERRLOG("%s %s %d, gethostbyname error. %s", __FILE__, __func__, __LINE__, domain);
+		return;
+	}
+
+	char ip[IP_SIZE];
+	for (char ** pptr = hptr->h_addr_list; NULL != *pptr; ++pptr)
+	{
+		if (NULL != inet_ntop(hptr->h_addrtype, *pptr, ip, IP_SIZE))
+		{
+			vecIp.push_back(std::string(ip));
+		}
 	}
 }

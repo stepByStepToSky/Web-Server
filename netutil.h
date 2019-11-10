@@ -13,6 +13,11 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <netinet/tcp.h>
+#include <netdb.h>
+
+#include <vector>
+#include <string>
+
 
 class NetUtil
 {
@@ -27,6 +32,7 @@ public:
 	static void SetNonblock(int fd);
 	static void SetNoDelay(int fd, int optval = 1);
 	static void SetAddr(const char * serverIp, uint16_t port, sockaddr_in & sockAddr);
+	static void GetIpByDomain(const char * domain, std::vector<std::string> & vecIp);
 };
 
 #endif

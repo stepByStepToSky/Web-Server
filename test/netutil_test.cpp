@@ -19,6 +19,12 @@ int main()
 	
 	int fd = NetUtil::Listen(servIp, port);
 	
+	vector<string> vecIp;
+	NetUtil::GetIpByDomain("smtp.gmail.com", vecIp);
+	for (int i = 0; i < vecIp.size(); ++i)
+	{
+		cout << vecIp[i] << endl;
+	}
 	
 	// Note that the async log can not be used in multi process environment, some bugs here.
 	if (0 == fork())
