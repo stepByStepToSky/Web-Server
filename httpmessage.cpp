@@ -112,7 +112,7 @@ HttpMessage::ParseState HttpMessage::Parse(SimpleBuffer & inBuffer)
 			inBuffer.ReadFromBuffer(paramPos + 1);
 			
 			paramPos = inBuffer.Find('&');
-			while(-1 != paramPos)
+			while(-1 != paramPos && paramPos < pos)
 			{
 				ssize_t keyEndPos = inBuffer.Find('=');
 				if (-1 == keyEndPos || keyEndPos > paramPos)
