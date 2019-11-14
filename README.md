@@ -38,6 +38,7 @@ Guide to header files:
 - **netutil.h** Encapsulate related functions of socket fd.
 - **simplebuffer.h** Application layer buffer(we only implement the LT model now).
 - **channel.h** Encapsulate channel(event) related callback functions (read/write/error functions).
+- **minheap.h** Use min heap to manage the expired time of connection.
 - **eventloop.h** It manages the channel(event), which is registed to the epoller, and process the active channels(events).
 - **eventloopthread.h** It manage a connect queue, and the main accept thread push connection socket fd into the queue, then this thread add the socket fds to its eventLoop.
 - **eventloopthreadpool.h** It manage several threads, the main accept thread push connection socket fd into the threadpool, it dispatches the socket to its threads.
