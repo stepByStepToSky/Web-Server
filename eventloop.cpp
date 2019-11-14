@@ -101,7 +101,7 @@ void EventLoop::Loop()
 			timeout = (minTime.tv_sec - nowTime.tv_sec) * 1000 + ((minTime.tv_usec - nowTime.tv_usec) / 1000) + kMilliseconds;
 			if (timeout < 0)
 			{
-				timeout = -1;
+				timeout = 0;
 			}
 		}
 
@@ -144,8 +144,8 @@ void EventLoop::ProcessActiveTimeEvents()
 		const ChannelPtr ptChannel = m_minHeapChannel.Top();
 		m_minHeapChannel.Pop();
 		write(ptChannel->GetFd(), replyMsg, sizeof(replyMsg));
-		close(ptChannel->GetFd());
 		RemoveChannel(ptChannel, EPOLLIN | EPOLLOUT);
+		close(ptChannel->GetFd());
 		DeleteLastActivedTime(ptChannel);
 	}
 }
