@@ -2,4 +2,7 @@
 - 参考[muduo](https://github.com/chenshuo/muduo)，使用双缓冲区技术实现异步日志系统
 - 参考[memcached](https://github.com/memcached/memcached/blob/master/memcached.c)的网络模型，主线程只负责accept请求，并以Round Robin的方式分发给其它IO线程，锁的争用只会出现在主线程和某一特定线程中，使用管道唤醒IO线程
 - 使用智能指针等RAII机制管理资源
+- 设计应用层缓冲区，每次读取时只是对缓冲区的读取下标前移，减少数据移动次数
 - 使用状态机解析了HTTP请求,支持管线化
+- 参考[libevent](https://github.com/libevent/libevent/blob/master/minheap-internal.h)对定时事件的处理方式，使用基于小根堆的定时器关闭超时连接
+- 采用工厂方法模式，分发处理对应cgi请求
