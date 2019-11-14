@@ -26,6 +26,7 @@ void TcpServer::ReadFromFdToBuffer(EventLoop & eventLoop, std::shared_ptr<Channe
 			DEBUGLOG("%s %s %d, %d bytes in the buffer of fd=%d need to be writen", __FILE__, __func__, __LINE__, outBuffer.BufferSize(), ptChannel->GetFd());
 			eventLoop.AddChannel(ptChannel, EPOLLOUT);
 		}
+		eventLoop.ChangeLastActivedTime(ptChannel, eventLoop.GetLastActiveTime());
 	}
 	
 	if (1 != nRead || 1 != readCallbackResult)
@@ -44,6 +45,7 @@ void TcpServer::ReadFromFdToBuffer(EventLoop & eventLoop, std::shared_ptr<Channe
 		
 		// peer socket close/shoutdown or get error
 		eventLoop.RemoveChannel(ptChannel, EPOLLIN | EPOLLOUT);
+		eventLoop.DeleteLastActivedTime(ptChannel);
 		close(ptChannel->GetFd());
 	}
 }
@@ -57,7 +59,9 @@ void TcpServer::WriteFromBufferToFd(EventLoop & eventLoop, std::shared_ptr<Chann
 		DEBUGLOG("%s %s %d, fd=%d gets error", __FILE__, __func__, __LINE__, ptChannel->GetFd());
 		// peer socket get error
 		eventLoop.RemoveChannel(ptChannel, EPOLLIN | EPOLLOUT);
+		eventLoop.DeleteLastActivedTime(ptChannel);
 		close(ptChannel->GetFd());
+		return;
 	}
 	else if (0 == nWrite)
 	{
@@ -69,12 +73,14 @@ void TcpServer::WriteFromBufferToFd(EventLoop & eventLoop, std::shared_ptr<Chann
 		}
 		eventLoop.RemoveChannel(ptChannel, EPOLLOUT);
 	}
+	eventLoop.ChangeLastActivedTime(ptChannel, eventLoop.GetLastActiveTime());
 }
 
 void TcpServer::ErrorCallBack(EventLoop & eventLoop, std::shared_ptr<Channel> ptChannel)
 {
 	m_errorCallback(ptChannel);
 	eventLoop.RemoveChannel(ptChannel, EPOLLIN | EPOLLOUT);
+	eventLoop.DeleteLastActivedTime(ptChannel);
 	close(ptChannel->GetFd());
 }
 
@@ -120,6 +126,7 @@ void TcpServer::NewConnectReadHandler(EventLoop & eventLoop, std::shared_ptr<Cha
 			ptConnChannel->SetWriteCallback(std::bind(&TcpServer::WriteFromBufferToFd, this, _1, _2));
 			ptConnChannel->SetErrorCallback(std::bind(&TcpServer::ErrorCallBack, this, _1, _2));
 			m_eventLoop.AddChannel(ptConnChannel, EPOLLIN);
+			m_eventLoop.AddLastActivedTime(ptChannel, m_eventLoop.GetLastActiveTime());
 		}
 		else
 		{

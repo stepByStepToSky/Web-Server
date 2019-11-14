@@ -1,6 +1,6 @@
 #include "channel.h"
 
-Channel::Channel(int fd) : m_fd(fd), m_events(0)
+Channel::Channel(int fd) : m_fd(fd), m_events(0), m_minHeapIndex(-1)
 {
 	
 }
@@ -49,6 +49,26 @@ SimpleBuffer & Channel::GetOutBuffer()
 HttpMessage & Channel::GetHttpMessage()
 {
 	return m_httpmessage;
+}
+
+const struct timeval & Channel::GetLastActiveTime()
+{
+	return m_stLastActiveTime;
+}
+
+void Channel::SetLastActiveTime(const struct timeval & stTimeval)
+{
+	m_stLastActiveTime = stTimeval;
+}
+
+int Channel::GetMinHeapIndex()
+{
+	return m_minHeapIndex;
+}
+
+void Channel::SetMinHeapIndex(int minHeapIndex)
+{
+	m_minHeapIndex = minHeapIndex;
 }
 
 void Channel::HandleEvent(EventLoop & eventLoop, std::shared_ptr<Channel> ptChannel, int revents)

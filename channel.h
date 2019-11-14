@@ -7,6 +7,7 @@
 #include <functional>
 #include <memory>
 #include <sys/epoll.h>
+#include <sys/time.h>
 
 #include "base/log.h"
 #include "simplebuffer.h"
@@ -31,6 +32,11 @@ public:
 	SimpleBuffer & GetOutBuffer();
 	HttpMessage & GetHttpMessage();
 	
+	const struct timeval & GetLastActiveTime();
+	void SetLastActiveTime(const struct timeval & stTimeval);
+	int GetMinHeapIndex();
+	void SetMinHeapIndex(int minHeapIndex);
+
 	void HandleEvent(EventLoop & eventLoop, std::shared_ptr<Channel> ptChannel, int revents);
 	
 private:
@@ -43,6 +49,9 @@ private:
 	SimpleBuffer m_inBuffer;
 	SimpleBuffer m_outBuffer;
 	HttpMessage m_httpmessage;
+
+	struct timeval m_stLastActiveTime;
+	int m_minHeapIndex;
 };
 
 #endif

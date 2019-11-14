@@ -2,6 +2,7 @@
 #include "channel.h"
 
 const int EventLoop::kActiveEventInitCnt = 4;
+const int EventLoop::kMilliseconds = 10000;
 
 EventLoop::EventLoop() : m_started(false)
 {
@@ -66,13 +67,47 @@ void EventLoop::RemoveChannel(ChannelPtr ptChannel, int deleteEvents)
 	}
 }
 
+const struct timeval & EventLoop::GetLastActiveTime()
+{
+	return m_lastActiveTime;
+}
+
+void EventLoop::AddLastActivedTime(ChannelPtr ptChannel, const struct timeval & stLastActiveTime)
+{
+	m_minHeapChannel.Push(ptChannel, stLastActiveTime);
+}
+
+void EventLoop::ChangeLastActivedTime(ChannelPtr ptChannel, const struct timeval & stLastActiveTime)
+{
+	m_minHeapChannel.Change(ptChannel, stLastActiveTime);
+}
+
+void EventLoop::DeleteLastActivedTime(ChannelPtr ptChannel)
+{
+	m_minHeapChannel.Delete(ptChannel);
+}
+
 void EventLoop::Loop()
 {
 	m_started = true;
 	while(m_started)
 	{
-		m_activeEventsCnt = m_epoller.EpollDispatch(m_vecActiveEvents, -1);
+		int timeout = -1;
+		if (!m_minHeapChannel.Empty())
+		{
+			struct timeval nowTime;
+			gettimeofday(&nowTime, NULL);
+			const struct timeval & minTime = m_minHeapChannel.Top()->GetLastActiveTime();
+			timeout = (minTime.tv_sec - nowTime.tv_sec) * 1000 + ((minTime.tv_usec - nowTime.tv_usec) / 1000) + kMilliseconds;
+			if (timeout < 0)
+			{
+				timeout = -1;
+			}
+		}
+
+		m_activeEventsCnt = m_epoller.EpollDispatch(m_vecActiveEvents, timeout);
 		ProcessActiveEvents();
+		ProcessActiveTimeEvents();
 	}
 }
 
@@ -83,6 +118,8 @@ void EventLoop::EventLoop::Quit()
 
 void EventLoop::ProcessActiveEvents()
 {
+	gettimeofday(&m_lastActiveTime, NULL);
+
 	for (int i = 0; i < m_activeEventsCnt; ++i)
 	{
 		std::unordered_map<int, ChannelPtr>::iterator iter = m_fd2ChannelPtrMap.find(m_vecActiveEvents[i].data.fd);
@@ -94,4 +131,21 @@ void EventLoop::ProcessActiveEvents()
 		}
 	}
 	m_activeEventsCnt = 0;
+}
+
+void EventLoop::ProcessActiveTimeEvents()
+{
+	long long milliTime = m_lastActiveTime.tv_sec * 1000 + (m_lastActiveTime.tv_usec / 1000) - kMilliseconds;
+	struct timeval activeExpiredTime = {milliTime / 1000, (milliTime % 1000)*1000};
+
+	while(!m_minHeapChannel.Empty() && TimevalGreater(activeExpiredTime, m_minHeapChannel.Top()->GetLastActiveTime()))
+	{
+		static const char replyMsg[] = "timeout";
+		const ChannelPtr ptChannel = m_minHeapChannel.Top();
+		m_minHeapChannel.Pop();
+		write(ptChannel->GetFd(), replyMsg, sizeof(replyMsg));
+		close(ptChannel->GetFd());
+		RemoveChannel(ptChannel, EPOLLIN | EPOLLOUT);
+		DeleteLastActivedTime(ptChannel);
+	}
 }

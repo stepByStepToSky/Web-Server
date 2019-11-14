@@ -29,6 +29,7 @@ void EventLoopThread::OnReadHandler(EventLoop & eventLoop, std::shared_ptr<Chann
 		ptChannel->SetWriteCallback(m_writeCallback);
 		ptChannel->SetErrorCallback(m_errorCallback);
 		m_eventLoop.AddChannel(ptChannel, EPOLLIN);
+		m_eventLoop.AddLastActivedTime(ptChannel, m_eventLoop.GetLastActiveTime());
 		DEBUGLOG("%s %s %d, EventLoopThread threadId=%d add socket fd=%d", __FILE__, __func__, __LINE__, m_threadId, m_vecQue[i]);
 	}
 	m_vecQue.clear();
