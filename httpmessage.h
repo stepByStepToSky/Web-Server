@@ -54,6 +54,7 @@ public:
 	const std::string & GetHttpVersion() const;
 	const std::string & GetBody() const;
 	const HeadMapType & GetHeadContent() const;
+	HeadMapType & GetHeadContent();
 	RespondType GetRespondCode() const;
 	const std::string & GetRespondMsg() const;
 	ParseState Parse(SimpleBuffer & inBuffer);

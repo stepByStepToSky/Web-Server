@@ -55,9 +55,15 @@ int HttpCgiServer::ReadRequestCallback(std::shared_ptr<Channel> ptChannel)
 	ptBaseCgi->Process(&httpMessage, respCode, sRespMsg, sContentType, sRespBody);
 	
 	httpMessage.BuildCgiRespond(respCode, sRespMsg, sContentType, sRespBody, outBuffer);
+	int iRet = 0;
+	HttpMessage::HeadMapType & headContent = httpMessage.GetHeadContent();
+	if ("HTTP/1.1" == httpMessage.GetHttpVersion() || "keep-alive" == headContent["Connection"])
+	{
+		iRet = 1;
+	}
 	httpMessage.Reset();
 	
-	return 1;
+	return iRet;
 }
 
 void HttpCgiServer::WriteCallback(std::shared_ptr<Channel> ptChannel)

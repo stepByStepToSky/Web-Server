@@ -57,6 +57,11 @@ const HttpMessage::HeadMapType & HttpMessage::GetHeadContent() const
 	return m_headContent;
 }
 
+HttpMessage::HeadMapType & HttpMessage::GetHeadContent()
+{
+	return m_headContent;
+}
+
 HttpMessage::RespondType HttpMessage::GetRespondCode() const
 {
 	return m_respondCode;
