@@ -102,6 +102,7 @@ void MinHeap::Push(ChannelPtr ptChannel, const struct timeval & stActiveTime)
     }
 
     ++m_size;
+	new (&m_data[m_size]) ChannelPtr(nullptr);
     m_data[m_size] = ptChannel;
     ptChannel->SetLastActiveTime(stActiveTime);
     ptChannel->SetMinHeapIndex(m_size);
