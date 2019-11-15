@@ -126,7 +126,7 @@ void TcpServer::NewConnectReadHandler(EventLoop & eventLoop, std::shared_ptr<Cha
 			ptConnChannel->SetWriteCallback(std::bind(&TcpServer::WriteFromBufferToFd, this, _1, _2));
 			ptConnChannel->SetErrorCallback(std::bind(&TcpServer::ErrorCallBack, this, _1, _2));
 			m_eventLoop.AddChannel(ptConnChannel, EPOLLIN);
-			m_eventLoop.AddLastActivedTime(ptChannel, m_eventLoop.GetLastActiveTime());
+			m_eventLoop.AddLastActivedTime(ptConnChannel, m_eventLoop.GetLastActiveTime());
 		}
 		else
 		{
