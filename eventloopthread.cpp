@@ -18,9 +18,9 @@ EventLoopThread::~EventLoopThread()
 void EventLoopThread::OnReadHandler(EventLoop & eventLoop, std::shared_ptr<Channel> ptChannel)
 {
 	char buff[1024];
-	read(m_pipeFd[0], buff, sizeof(buff));
 	
 	LockGuard lock(m_mutex);
+	read(m_pipeFd[0], buff, sizeof(buff));
 	size_t queSize = m_vecQue.size();
 	for (size_t i = 0; i < queSize; ++i)
 	{
