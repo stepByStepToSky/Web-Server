@@ -8,13 +8,12 @@ Test page ：[ExampleCgi](http://106.54.211.174:9508/cgi-bin/example?name=lufan&
 ## Build
 a) To Compile source files into binary executables (in the root folder)
 ```cmd
-mkdir build && cd build
-cmake ..
-make
+bash install.sh
 ```
 
 b) Run the program (in the build folder)
 ```cmd
+cd build
 ./httpcgiservermain
 ```
 
