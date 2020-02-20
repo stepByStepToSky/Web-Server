@@ -22,7 +22,7 @@ int SimpleBuffer::ReadFromFd(int fd)
 	{
 		// if move data to head can satisfy to write kReadOrWriteFromFdSize bytes data to buffer, 
 		// we do not malloc memory, just by moving data to the head
-		if (NULL != m_buffer)
+		if (NULL != m_buffer && 0 != m_readOffset)
 		{
 			memmove(m_buffer, m_buffer + m_readOffset, m_writeOffset - m_readOffset);
 			m_writeOffset -= m_readOffset;
@@ -120,7 +120,7 @@ void SimpleBuffer::WriteToBuffer(const char * data, size_t writeSize)
 	{
 		// if move data to head can satisfy to write writeSize bytes data to buffer, 
 		// we do not malloc memory, just by moving data to the head
-		if (NULL != m_buffer)
+		if (NULL != m_buffer && 0 != m_readOffset)
 		{
 			memmove(m_buffer, m_buffer + m_readOffset, m_writeOffset - m_readOffset);
 			m_writeOffset -= m_readOffset;
