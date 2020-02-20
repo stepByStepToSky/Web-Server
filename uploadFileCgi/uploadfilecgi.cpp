@@ -24,7 +24,7 @@ static void WriteFileToDisk(const std::string & sContent, const std::string & sF
 	fout.close();
 }
 
-void UploadFileCgi::ProcessImp(int & respondCode, std::string sRespMsg, std::string & sContentType, std::string & sRespBoby)
+void UploadFileCgi::ProcessImp(int & respondCode, std::string & sRespMsg, std::string & sContentType, std::string & sRespBoby)
 {
 	const std::string & sFileName = GetStringValue("fileName");
 	

@@ -5,7 +5,7 @@
 
 class LoginCgi : public BaseCgi
 {
-	virtual void ProcessImp(int & respondCode, std::string sRespMsg, std::string & sContentType, std::string & sRespBoby);
+	virtual void ProcessImp(int & respondCode, std::string & sRespMsg, std::string & sContentType, std::string & sRespBoby);
 };
 
 #endif

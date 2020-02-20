@@ -18,7 +18,7 @@ static void ReadFile(std::string sPath, std::string & sRespond)
 	sRespond.assign(buffer.data(), flength);
 }
 
-void LoginCgi::ProcessImp(int & respondCode, std::string sRespMsg, std::string & sContentType, std::string & sRespBoby)
+void LoginCgi::ProcessImp(int & respondCode, std::string & sRespMsg, std::string & sContentType, std::string & sRespBoby)
 {
 	const std::string & sFileName = GetStringValue("fileName");
 	

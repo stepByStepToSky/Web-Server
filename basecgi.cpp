@@ -12,7 +12,7 @@ BaseCgi::~BaseCgi()
 	
 }
 
-void BaseCgi::Process(const HttpMessage * ptHttpMessage, int & respondCode, std::string sRespMsg, std::string & sContentType, std::string & sRespBoby)
+void BaseCgi::Process(const HttpMessage * ptHttpMessage, int & respondCode, std::string & sRespMsg, std::string & sContentType, std::string & sRespBoby)
 {
 	m_ptHttpMessage = ptHttpMessage;
 	respondCode = 200;
