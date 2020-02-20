@@ -95,7 +95,11 @@ int SimpleBuffer::WriteToFd(int fd)
 
 const char * SimpleBuffer::Buffer()
 {
-	m_buffer[m_writeOffset] = '\0';
+	if (m_allocSize > m_writeOffset)
+	{
+		m_buffer[m_writeOffset] = '\0';
+	}
+	
 	return (m_buffer + m_readOffset);
 }
 
